@@ -1,5 +1,6 @@
 import random
 import math
+from bitarray import bitarray
 
 start_address = (0, 0)  # Starting point for the Courier
 maxX, maxY = 13, 20     # Map Dimentions
@@ -32,7 +33,12 @@ def generateStartingSolutions(V, M, D, h, start_address, packs, amount=50):
     
     while sol_generated_count <= amount:
         
-        choice = [ pack[4] for pack in packs ] # Making sure that the packs with priority flag are selected
+        choice = bitarray(len(packs))
+        choice.setall(0)
+        for i, pack in enumerate(packs):  # Making sure that the packs with priority flag are selected
+            if pack[4] == 1:
+                choice[i] = 1
+
         packs_left_index = [i for i in range(len(packs)) if packs[i][4] == 0]
 
         # Random additional packs and random order
