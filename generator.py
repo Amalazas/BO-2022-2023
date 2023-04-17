@@ -3,7 +3,7 @@ import math
 from bitarray import bitarray
 
 
-class permSolution():
+class PermSolution():
     choice = None
     perm = None
     
@@ -14,25 +14,25 @@ class permSolution():
     def __str__(self) -> str:
         return f"{self.choice}, {self.perm}"
 
-class matSolution():
+class MatSolution():
     mat = None
     
     def __init__(self, matrix):
         self.mat = matrix
     
     def __str__(self) -> str:
-        matStr = ""
+        mat_str = ""
         for row in self.mat:
             for el in row:
-                matStr += str(el) + ' '
-            matStr += '\n'
-        return matStr
+                mat_str += str(el) + ' '
+            mat_str += '\n'
+        return mat_str
         
         
 def distance(p1, p2):
     return math.sqrt( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
 
-def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
+def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
     solutions = []
     sol_generated_count = 0
     generation_attempts_cout = 0
@@ -67,7 +67,7 @@ def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
 
         # Adding solution to the retured list if it is acceptable
         if dist <= D and count >= h and volume <= V and weight <= M:
-            solutions.append( permSolution(choice, perm) )
+            solutions.append( PermSolution(choice, perm) )
             sol_generated_count += 1
         
         generation_attempts_cout += 1
@@ -75,7 +75,7 @@ def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
     print(f"{generation_attempts_cout=}")
     return solutions
 
-def solutionsToMatrices(solutions, packsCount):
+def solutions_to_matrices(solutions, packsCount):
     matrices = []
     for solution in solutions:
         matrix = [ bitarray(packsCount) for _ in range(packsCount)]
@@ -83,7 +83,7 @@ def solutionsToMatrices(solutions, packsCount):
             row.setall(0)
         for index, pack_nr in enumerate(solution.perm):
             matrix[pack_nr][index] = 1
-        matrices.append(matSolution(matrix))
+        matrices.append(MatSolution(matrix))
     return matrices
     
 
@@ -93,7 +93,7 @@ if __name__  == "__main__":
 
     # EXAMPLE OF PROBLEM DEFINITION
     start_address = (0, 0)  # Starting point for the Courier
-    maxX, maxY = 13, 20     # Map Dimentions
+    max_x, max_y = 13, 20     # Map Dimentions
 
     V = 30   # Max Volume
     M = 30   # Max Weight
@@ -114,7 +114,7 @@ if __name__  == "__main__":
     ]
 
     # Prints package addresses map
-    map = [['-' for _ in range(maxY)] for _ in range(maxX)]
+    map = [['-' for _ in range(max_y)] for _ in range(max_x)]
     map[start_address[0]][start_address[1]] = 'X'
     for pack in packs:
         map[pack[3][0]][pack[3][1]] = '0'
@@ -125,8 +125,8 @@ if __name__  == "__main__":
 
     # Generates and prints first batch of solutions
     print("\n\nFirst Generation:")
-    solutions = generateInitialSolutions(V, M, D, h, start_address, packs, 20)
-    solutionsMatrices = solutionsToMatrices(solutions, len(packs))
+    solutions = generate_initial_solutions(V, M, D, h, start_address, packs, 20)
+    solutions_matrices = solutions_to_matrices(solutions, len(packs))
     for i in range(len(solutions)):
         print(solutions[i])
-        print(solutionsMatrices[i])
+        print(solutions_matrices[i])

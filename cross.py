@@ -4,7 +4,7 @@ from generator import *
 from bitarray import bitarray
 
 
-def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:  # NOT FINISHED
+def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution:  # NOT FINISHED
     """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację """
     
     print(parent1)
@@ -12,15 +12,15 @@ def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution: 
     half1 = parent1.choice[:len(parent1.choice)//2]
     half2 = parent2.choice[len(parent2.choice)//2:] 
     print(half1, half2)
-    newChoice = half1 + half2
+    new_choice = half1 + half2
     
     # Do napisania: Tworzenie permutacji dla potomka.
-    
+
 
     return None
 
 
-def extract_and_random_pick(parent1: permSolution, parent2: permSolution) -> permSolution:
+def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     
     print(parent1)
@@ -52,7 +52,7 @@ def extract_and_random_pick(parent1: permSolution, parent2: permSolution) -> per
     for index in new_perm:
         new_choice[index] = 1
 
-    return permSolution(new_choice, new_perm)
+    return PermSolution(new_choice, new_perm)
 
 
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     # EXAMPLE OF PROBLEM DEFINITION
     start_address = (0, 0)  # Starting point for the Courier
-    maxX, maxY = 13, 20     # Map Dimentions
+    max_x, max_y = 13, 20     # Map Dimentions
 
     V = 30   # Max Volume
     M = 30   # Max Weight
@@ -82,6 +82,6 @@ if __name__ == "__main__":
     ]
 
     # Generating and choosing solutions to cross
-    solutions = generateInitialSolutions(V, M, D, h, start_address, packs, 20)
-    halveAndSwap(solutions[2], solutions[15])  # Just for testing purposes
+    solutions = generate_initial_solutions(V, M, D, h, start_address, packs, 20)
+    halve_and_swap(solutions[2], solutions[15])  # Just for testing purposes
     # print(extract_and_random_pick(solutions[2], solutions[15]))
