@@ -3,6 +3,31 @@ import math
 from bitarray import bitarray
 
 
+class permSolution():
+    choice = None
+    perm = None
+    
+    def __init__(self, choice, perm):
+        self.choice = choice
+        self.perm = perm
+    
+    def __str__(self) -> str:
+        return f"{self.choice}, {self.perm}"
+
+class matSolution():
+    mat = None
+    def __init__(self, matrix):
+        self.mat = matrix
+    
+    def __str__(self) -> str:
+        matStr = ""
+        for row in self.mat:
+            for el in row:
+                matStr += str(el) + ' '
+            matStr += '\n'
+        return matStr
+        
+        
 def distance(p1, p2):
     return math.sqrt( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
 
@@ -41,7 +66,7 @@ def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
 
         # Adding solution to the retured list if it is acceptable
         if dist <= D and count >= h and volume <= V and weight <= M:
-            solutions.append( (choice, perm) )
+            solutions.append( permSolution(choice, perm) )
             sol_generated_count += 1
         
         generation_attempts_cout += 1
@@ -49,13 +74,15 @@ def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
     print(f"{generation_attempts_cout=}")
     return solutions
 
-def solutionsToMatrices(solutions, N):
+def solutionsToMatrices(solutions, packsCount):
     matrices = []
     for solution in solutions:
-        matrix = [ [0 for _ in range(N)] for _ in range(N) ]
-        for index, pack_nr in enumerate(solution[1]):
+        matrix = [ bitarray(packsCount) for _ in range(packsCount)]
+        for row in matrix:
+            row.setall(0)
+        for index, pack_nr in enumerate(solution.perm):
             matrix[pack_nr][index] = 1
-        matrices.append(matrix)
+        matrices.append(matSolution(matrix))
     return matrices
     
 
@@ -101,7 +128,4 @@ if __name__  == "__main__":
     solutionsMatrices = solutionsToMatrices(solutions, len(packs))
     for i in range(len(solutions)):
         print(solutions[i])
-        for row in solutionsMatrices[i]:
-            for el in row:
-                print(el, end=' ')
-            print()
+        print(solutionsMatrices[i])
