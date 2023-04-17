@@ -19,7 +19,31 @@ def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:
     return None
 
 
+def extract_and_random_pick(parent1: permSolution, parent2: permSolution) -> permSolution:
+    common_packages_bitmap = parent1.choice & parent2.choice
+    
+    new_perm = [package for package in parent2.perm if common_packages_bitmap[package] == 1]
+    left_packages = {package for package in parent2.perm if common_packages_bitmap[package] == 0} | {package for package in parent1.perm if common_packages_bitmap[package] == 0}
+    
+    v = m = d = 0
+    for pckg_idx in new_perm:
+        pckg = packs[pckg_idx]
+        m += packs[pckg_idx][1]
+        v += packs[pckg_idx][2]
 
+    for i in range(len(new_perm) - 1):
+        d += distance(packs[new_perm[i]][3], packs[new_perm[i + 1]][3])
+    
+    for pckg_idx in left_packages:
+        _, pckg_m, pckg_v, (x, y), _ = packs[pckg_idx]
+        if v + pckg_v <= V and m + pckg_m <= M and d + distance(packs[new_perm[-1]][3], (x, y)) + distance((x, y), packs[new_perm[0]][3]) <= D:
+            new_perm.append(pckg_idx)
+        
+        v += pckg_v
+        m += pckg_m
+        d += distance(packs[new_perm[-1]][3], (x, y)) + distance((x, y), packs[new_perm[0]][3])
+
+    return new_perm
 
 if __name__ == "__main__":
 
@@ -48,3 +72,4 @@ if __name__ == "__main__":
     # Generating and choosing solutions to cross
     solutions = generateInitialSolutions(V, M, D, h, start_address, packs, 20)
     halveAndSwap(solutions[2], solutions[15])  # Just for testing purposes
+    print(extract_and_random_pick(solutions[2], solutions[15]))
