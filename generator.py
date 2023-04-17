@@ -16,6 +16,7 @@ class permSolution():
 
 class matSolution():
     mat = None
+    
     def __init__(self, matrix):
         self.mat = matrix
     
