@@ -4,7 +4,7 @@ from generator import *
 from bitarray import bitarray
 
 
-def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:
+def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:  # NOT FINISHED
     """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację """
     
     print(parent1)
@@ -15,6 +15,7 @@ def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:
     newChoice = half1 + half2
     
     # Do napisania: Tworzenie permutacji dla potomka.
+    
 
     return None
 
@@ -22,6 +23,9 @@ def halveAndSwap(parent1: permSolution, parent2: permSolution) -> permSolution:
 def extract_and_random_pick(parent1: permSolution, parent2: permSolution) -> permSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     
+    print(parent1)
+    print(parent2)
+
     new_perm = [package for package in parent2.perm if common_packages_bitmap[package] == 1]
     left_packages = {package for package in parent2.perm if common_packages_bitmap[package] == 0} | {package for package in parent1.perm if common_packages_bitmap[package] == 0}
     
@@ -43,7 +47,15 @@ def extract_and_random_pick(parent1: permSolution, parent2: permSolution) -> per
         m += pckg_m
         d += distance(packs[new_perm[-1]][3], (x, y)) + distance((x, y), packs[new_perm[0]][3])
 
-    return new_perm
+    new_choice = bitarray(len(parent1.choice))
+    new_choice.setall(0)
+    for index in new_perm:
+        new_choice[index] = 1
+
+    return permSolution(new_choice, new_perm)
+
+
+
 
 if __name__ == "__main__":
 
@@ -72,4 +84,4 @@ if __name__ == "__main__":
     # Generating and choosing solutions to cross
     solutions = generateInitialSolutions(V, M, D, h, start_address, packs, 20)
     halveAndSwap(solutions[2], solutions[15])  # Just for testing purposes
-    print(extract_and_random_pick(solutions[2], solutions[15]))
+    # print(extract_and_random_pick(solutions[2], solutions[15]))
