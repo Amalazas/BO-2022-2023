@@ -2,31 +2,11 @@ import random
 import math
 from bitarray import bitarray
 
-start_address = (0, 0)  # Starting point for the Courier
-maxX, maxY = 13, 20     # Map Dimentions
-
-V = 30   # Max Volume
-M = 30   # Max Weight
-D = 200  # Max Distance
-h = 5    # Min Number Of Chosen Packs
-
-packs = [
-    (0,  2,  2, (3,2),   0),
-    (1,  2,  2, (1,1),   0), 
-    (2,  10, 5, (10,19), 1), 
-    (3,  4,  3, (10,12), 0),
-    (4,  2,  2, (3,4),   1),
-    (5,  1,  2, (1,10),  0),
-    (6,  12, 2, (4,1),   0),
-    (7,  2,  2, (12,1),  1),
-    (8,  5,  2, (9,2),   0),
-    (9,  3,  2, (5,5),   0), 
-]
 
 def distance(p1, p2):
     return math.sqrt( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
 
-def generateStartingSolutions(V, M, D, h, start_address, packs, amount=50):
+def generateInitialSolutions(V, M, D, h, start_address, packs, amount=50):
     solutions = []
     sol_generated_count = 0
     generation_attempts_cout = 0
@@ -38,7 +18,6 @@ def generateStartingSolutions(V, M, D, h, start_address, packs, amount=50):
         for i, pack in enumerate(packs):  # Making sure that the packs with priority flag are selected
             if pack[4] == 1:
                 choice[i] = 1
-
         packs_left_index = [i for i in range(len(packs)) if packs[i][4] == 0]
 
         # Random additional packs and random order
@@ -80,7 +59,31 @@ def solutionsToMatrices(solutions, N):
     return matrices
     
 
+
+
 if __name__  == "__main__":
+
+    # EXAMPLE OF PROBLEM DEFINITION
+    start_address = (0, 0)  # Starting point for the Courier
+    maxX, maxY = 13, 20     # Map Dimentions
+
+    V = 30   # Max Volume
+    M = 30   # Max Weight
+    D = 200  # Max Distance
+    h = 5    # Min Number Of Chosen Packs
+
+    packs = [
+        (0,  2,  2, (3,2),   0),
+        (1,  2,  2, (1,1),   0), 
+        (2,  10, 5, (10,19), 1), 
+        (3,  4,  3, (10,12), 0),
+        (4,  2,  2, (3,4),   1),
+        (5,  1,  2, (1,10),  0),
+        (6,  12, 2, (4,1),   0),
+        (7,  2,  2, (12,1),  1),
+        (8,  5,  2, (9,2),   0),
+        (9,  3,  2, (5,5),   0), 
+    ]
 
     # Prints package addresses map
     map = [['-' for _ in range(maxY)] for _ in range(maxX)]
@@ -94,7 +97,7 @@ if __name__  == "__main__":
 
     # Generates and prints first batch of solutions
     print("\n\nFirst Generation:")
-    solutions = generateStartingSolutions(V, M, D, h, start_address, packs, 20)
+    solutions = generateInitialSolutions(V, M, D, h, start_address, packs, 20)
     solutionsMatrices = solutionsToMatrices(solutions, len(packs))
     for i in range(len(solutions)):
         print(solutions[i])
