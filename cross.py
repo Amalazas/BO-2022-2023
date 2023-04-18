@@ -4,34 +4,58 @@ from generator import *
 from bitarray import bitarray
 
 
-def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution:  # NOT FINISHED
-    """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację """
-    
-    print(parent1)
-    print(parent2)
+def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
+    """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców. """
+
+    ## Childs' packages choice array
     half1 = parent1.choice[:len(parent1.choice)//2]
     half2 = parent2.choice[len(parent2.choice)//2:] 
-    print(half1, half2)
     new_choice = half1 + half2
     
-    # Do napisania: Tworzenie permutacji dla potomka.
-
-
-    return None
+    ## Child's permutation
+    new_perm = []
+    # Going through the first half of the choice and getting subseries from parent1 permutation
+    unused_packs_indexes = [i for i in range(len(half1)) if half1[i] == 1]
+    
+    while len(unused_packs_indexes) > 0:
+        current_pack_nr = unused_packs_indexes.pop(0)
+        new_perm.append(current_pack_nr)
+        current_pack_nr_perm1_index = parent1.perm.index(current_pack_nr)
+        while (current_pack_nr_perm1_index + 1 < len(parent1.perm)              # Don't go beyond the size of permutation
+            and (new_choice[parent1.perm[current_pack_nr_perm1_index+1]] == 1)  # Add only packs selected for the child
+            and parent1.perm[current_pack_nr_perm1_index+1] not in new_perm):   # Add only packs that are not already in the new_perm
+            # Adding the next pack from the parent1 permutation to the child permutation
+            current_pack_nr_perm1_index += 1
+            if parent1.perm[current_pack_nr_perm1_index] in unused_packs_indexes:
+                unused_packs_indexes.remove(parent1.perm[current_pack_nr_perm1_index])
+            new_perm.append(parent1.perm[current_pack_nr_perm1_index])
+        
+    # Going through the second half of the choice and getting subseries from parent2 permutation
+    unused_packs_indexes = [len(half1)+i for i in range(len(half2)) if half2[i] == 1]
+    
+    while len(unused_packs_indexes) > 0:
+        current_pack_nr = unused_packs_indexes.pop(0)
+        new_perm.append(current_pack_nr)
+        current_pack_nr_perm2_index = parent2.perm.index(current_pack_nr)
+        while (current_pack_nr_perm2_index + 1 < len(parent2.perm)              # Don't go beyond the size of permutation
+            and (new_choice[parent2.perm[current_pack_nr_perm2_index+1]] == 1)  # Add only packs selected for the child
+            and parent2.perm[current_pack_nr_perm2_index+1] not in new_perm):   # Add only packs that are not already in the new_perm
+            # Adding the next pack from the parent2 permutation to the child permutation
+            current_pack_nr_perm2_index += 1
+            if parent2.perm[current_pack_nr_perm2_index] in unused_packs_indexes:
+                unused_packs_indexes.remove(parent2.perm[current_pack_nr_perm2_index])
+            new_perm.append(parent2.perm[current_pack_nr_perm2_index])
+    
+    return PermSolution(new_choice, new_perm)
 
 
 def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
-    
-    print(parent1)
-    print(parent2)
-
     new_perm = [package for package in parent2.perm if common_packages_bitmap[package] == 1]
     left_packages = {package for package in parent2.perm if common_packages_bitmap[package] == 0} | {package for package in parent1.perm if common_packages_bitmap[package] == 0}
     
     v = m = d = 0
     for pckg_idx in new_perm:
-        pckg = packs[pckg_idx]
         m += packs[pckg_idx][1]
         v += packs[pckg_idx][2]
 
@@ -83,5 +107,9 @@ if __name__ == "__main__":
 
     # Generating and choosing solutions to cross
     solutions = generate_initial_solutions(V, M, D, h, start_address, packs, 20)
-    halve_and_swap(solutions[2], solutions[15])  # Just for testing purposes
-    # print(extract_and_random_pick(solutions[2], solutions[15]))
+    parent1 = solutions[2]
+    parent2 = solutions[15]
+    print(f"Parent1: {parent1}\nParent2: {parent2}")
+    child1 = halve_and_swap(parent1, parent2)
+    child2 = extract_and_random_pick(parent1, parent2)
+    print(f"Child1:  {child1}\nChild2:  {child2}")

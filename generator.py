@@ -35,7 +35,7 @@ def distance(p1, p2):
 def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
     solutions = []
     sol_generated_count = 0
-    generation_attempts_cout = 0
+    generation_attempts_count = 0
     
     while sol_generated_count <= amount:
         
@@ -70,9 +70,9 @@ def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
             solutions.append( PermSolution(choice, perm) )
             sol_generated_count += 1
         
-        generation_attempts_cout += 1
+        generation_attempts_count += 1
 
-    print(f"{generation_attempts_cout=}")
+    # print(f"{generation_attempts_count=}")
     return solutions
 
 def solutions_to_matrices(solutions, packsCount):
