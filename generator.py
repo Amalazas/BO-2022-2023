@@ -1,5 +1,6 @@
-import random
 import math
+import random
+
 from bitarray import bitarray
 
 
@@ -7,7 +8,7 @@ class PermSolution():
     choice = None
     perm = None
     
-    def __init__(self, choice, perm):
+    def __init__(self, choice, perm) -> None:
         self.choice = choice
         self.perm = perm
     
