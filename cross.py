@@ -2,10 +2,12 @@ import random
 import math
 from generator import *
 from bitarray import bitarray
+from copy import copy
 
 
 def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
-    """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców. """
+    """ Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców. 
+        Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!! """
 
     ## Childs' packages choice array
     half1 = parent1.choice[:len(parent1.choice)//2]
@@ -79,6 +81,28 @@ def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution) -> Per
     return PermSolution(new_choice, new_perm)
 
 
+def choice_from_one_order_from_other(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
+    """ Copy choice of the first parent and base the order by the order of second parent. 
+        Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!! 
+        Also, kinda weird way to cross :D """
+
+    new_choice = parent1.choice
+    new_perm = []
+    parent1_perm = copy(parent1.perm)
+    parent2_perm = copy(parent2.perm)
+
+    # Adding all the elements from parent1's perm in the order of parent2 to the child's permutation
+    for pack in parent2_perm:
+        if pack in parent1_perm:
+            new_perm.append(pack)
+            parent1_perm.remove(pack)
+
+    # Inserting the packs picked only by the parent1 in order they were written in parent1's permutation
+    for pack in parent1_perm:
+        new_perm.insert(parent1.perm.index(pack), pack)
+
+    return PermSolution(new_choice, new_perm)
+
 
 
 if __name__ == "__main__":
@@ -110,6 +134,10 @@ if __name__ == "__main__":
     parent1 = solutions[2]
     parent2 = solutions[15]
     print(f"Parent1: {parent1}\nParent2: {parent2}")
-    child1 = halve_and_swap(parent1, parent2)
-    child2 = extract_and_random_pick(parent1, parent2)
-    print(f"Child1:  {child1}\nChild2:  {child2}")
+    child1_1 = halve_and_swap(parent1, parent2)
+    child1_2 = halve_and_swap(parent2, parent1)
+    child2_1 = extract_and_random_pick(parent1, parent2)
+    child2_2 = extract_and_random_pick(parent2, parent1)
+    child3_1 = choice_from_one_order_from_other(parent1, parent2)
+    child3_2 = choice_from_one_order_from_other(parent2, parent1)
+    print(f"Child1_1:  {child1_1}\nChild1_2:  {child1_2}\nChild2_1:  {child2_1}\nChild2_2:  {child2_2}\nChild3_1:  {child3_1}\nChild3_2:  {child3_2}")

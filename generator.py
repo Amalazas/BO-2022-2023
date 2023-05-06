@@ -76,6 +76,7 @@ def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
     return solutions
 
 def solutions_to_matrices(solutions, packsCount):
+    """ Convert list of PermSolutions to a list of MatSolutions """
     matrices = []
     for solution in solutions:
         matrix = [ bitarray(packsCount) for _ in range(packsCount)]
