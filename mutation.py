@@ -1,16 +1,17 @@
 import random
+from typing import Any
 
 from bitarray import bitarray
 
 from generator import PermSolution
 
 
-def inverse_delivery_order(individual: PermSolution) -> None:
+def inverse_permutation(perm: list[Any]) -> None:
     """Modifies a PermSolution by swapping unique pairs of
     permutation, ensuring distinct indices for each inversion.
     The number of swaps is a random integer from [1, len(perm) // 2]."""
 
-    perm_len = len(individual.perm)
+    perm_len = len(perm)
     indices = [idx for idx in range(perm_len)]
     random.shuffle(indices)
 
@@ -18,13 +19,12 @@ def inverse_delivery_order(individual: PermSolution) -> None:
     inverses_num = random.randint(1, perm_len // 2)
     for _ in range(inverses_num):
         i, j = indices_set.pop(), indices_set.pop()
-        individual.perm[i], individual.perm[j] = individual.perm[j], individual.perm[i]
+        perm[i], perm[j] = perm[j], perm[i]
 
 
-def shift_delivery_order_block(individual: PermSolution) -> None:
+def shift_block(perm: list[Any]) -> None:
     """Randomly shifts a block of random length by a random number of positions within a permutation list."""
 
-    perm = individual.perm
     if (perm_len := len(perm)) < 2:
         return None
 
@@ -43,13 +43,12 @@ def shift_delivery_order_block(individual: PermSolution) -> None:
 
     shift_postitions = random.randint(1, len(rest_block) - 1)
     insert_idx = (insert_idx + shift_postitions) % len(rest_block)
-    individual.perm = rest_block[:insert_idx] + shift_block + rest_block[insert_idx:]
+    perm = rest_block[:insert_idx] + shift_block + rest_block[insert_idx:]
 
 
-def shuffle_delivery_order_block(individual: PermSolution) -> None:
+def shuffle_block(perm: list[Any]) -> None:
     """Shuffles a randomly selected block of elements within a permutation list."""
 
-    perm = individual.perm
     perm_len = len(perm)
 
     block_start_idx = random.randint(0, perm_len - 1)
@@ -76,5 +75,5 @@ if __name__ == "__main__":
     print(perm_sol)
     # inverse_delivery_order(perm_sol)
     # shift_delivery_order_block(perm_sol)
-    shuffle_delivery_order_block(perm_sol)
+    shuffle_block(perm_sol.perm)
     print(perm_sol)
