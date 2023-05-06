@@ -69,11 +69,32 @@ def shuffle_block(perm: list[Any]) -> None:
         perm[: len(shuffle_block) - elems_to_end] = shuffle_block[elems_to_end:]
 
 
+def inverse_packages(individual: PermSolution) -> None:
+    """Inverses random pair of (taken, nontaken) packages
+    TODO: Implement in such a way that it is guaranteed not to produce invalid solutions???"""
+
+    packages = individual.choice
+    taken_packages = [i for i in range(len(packages)) if packages[i] == 1]
+    nontaken_packages = [i for i in range(len(packages)) if packages[i] == 0]
+
+    taken_package = random.choice(taken_packages)
+    nontaken_package = random.choice(nontaken_packages)
+
+    packages[taken_package] = 0
+    packages[nontaken_package] = 1
+
+    for i in range(len(individual.perm)):
+        if individual.perm[i] == taken_package:
+            individual.perm[i] = nontaken_package
+            break
+
+
 if __name__ == "__main__":
     perm_sol = PermSolution(choice=bitarray("0011110101"), perm=[9, 2, 5, 3, 4, 7])
 
     print(perm_sol)
     # inverse_delivery_order(perm_sol)
     # shift_delivery_order_block(perm_sol)
-    shuffle_block(perm_sol.perm)
+    # shuffle_block(perm_sol.perm)
+    inverse_packages(perm_sol)
     print(perm_sol)
