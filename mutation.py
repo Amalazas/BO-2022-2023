@@ -6,12 +6,12 @@ from bitarray import bitarray
 from generator import PermSolution
 
 
-def inverse_permutation(perm: list[Any]) -> None:
+def inverse_permutation(individual: PermSolution) -> None:
     """Modifies a PermSolution by swapping unique pairs of
     permutation, ensuring distinct indices for each inversion.
     The number of swaps is a random integer from [1, len(perm) // 2]."""
 
-    perm_len = len(perm)
+    perm_len = len(individual.perm)
     indices = [idx for idx in range(perm_len)]
     random.shuffle(indices)
 
@@ -19,54 +19,54 @@ def inverse_permutation(perm: list[Any]) -> None:
     inverses_num = random.randint(1, perm_len // 2)
     for _ in range(inverses_num):
         i, j = indices_set.pop(), indices_set.pop()
-        perm[i], perm[j] = perm[j], perm[i]
+        individual.perm[i], individual.perm[j] = individual.perm[j], individual.perm[i]
 
 
-def shift_block(perm: list[Any]) -> None:
+def shift_block(individual: PermSolution) -> None:
     """Randomly shifts a block of random length by a random number of positions within a permutation list."""
 
-    if (perm_len := len(perm)) < 2:
+    if (perm_len := len(individual.perm)) < 2:
         return None
 
     block_start_idx = random.randint(0, perm_len - 1)
     shift_block_len = random.randint(1, perm_len - 2)
-    shift_block = perm[block_start_idx : block_start_idx + shift_block_len]
+    shift_block = individual.perm[block_start_idx : block_start_idx + shift_block_len]
 
     if len(shift_block) != shift_block_len:
         end_shift_block_idx = shift_block_len - len(shift_block)
-        rest_block = perm[end_shift_block_idx:block_start_idx]
-        shift_block += perm[:end_shift_block_idx]
+        rest_block = individual.perm[end_shift_block_idx:block_start_idx]
+        shift_block += individual.perm[:end_shift_block_idx]
         insert_idx = 0
     else:
-        rest_block = perm[:block_start_idx] + perm[block_start_idx + shift_block_len :]
+        rest_block = individual.perm[:block_start_idx] + individual.perm[block_start_idx + shift_block_len :]
         insert_idx = block_start_idx
 
     shift_postitions = random.randint(1, len(rest_block) - 1)
     insert_idx = (insert_idx + shift_postitions) % len(rest_block)
-    perm = rest_block[:insert_idx] + shift_block + rest_block[insert_idx:]
+    individual.perm = rest_block[:insert_idx] + shift_block + rest_block[insert_idx:]
 
 
-def shuffle_block(perm: list[Any]) -> None:
+def shuffle_block(individual: PermSolution) -> None:
     """Shuffles a randomly selected block of elements within a permutation list."""
 
-    perm_len = len(perm)
+    perm_len = len(individual.perm)
 
     block_start_idx = random.randint(0, perm_len - 1)
     shuffle_block_len = random.randint(2, perm_len)
-    shuffle_block = perm[block_start_idx : block_start_idx + shuffle_block_len]
+    shuffle_block = individual.perm[block_start_idx : block_start_idx + shuffle_block_len]
 
     if len(shuffle_block) != shuffle_block_len:
-        shuffle_block += perm[: shuffle_block_len - len(shuffle_block)]
+        shuffle_block += individual.perm[: shuffle_block_len - len(shuffle_block)]
 
     random.shuffle(shuffle_block)
 
-    elems_to_end = len(perm) - block_start_idx
-    perm[block_start_idx : block_start_idx + shuffle_block_len] = shuffle_block[
+    elems_to_end = len(individual.perm) - block_start_idx
+    individual.perm[block_start_idx : block_start_idx + shuffle_block_len] = shuffle_block[
         :elems_to_end
     ]
 
     if elems_to_end < len(shuffle_block):
-        perm[: len(shuffle_block) - elems_to_end] = shuffle_block[elems_to_end:]
+        individual.perm[: len(shuffle_block) - elems_to_end] = shuffle_block[elems_to_end:]
 
 
 def inverse_packages(individual: PermSolution) -> None:

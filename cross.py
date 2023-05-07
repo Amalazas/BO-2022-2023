@@ -5,7 +5,7 @@ from bitarray import bitarray
 from generator import PermSolution, distance, generate_initial_solutions
 
 
-def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution:
+def halve_and_swap(parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None) -> PermSolution:
     """Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!"""
 
@@ -62,7 +62,7 @@ def halve_and_swap(parent1: PermSolution, parent2: PermSolution) -> PermSolution
 
 
 def extract_and_random_pick(
-    parent1: PermSolution, parent2: PermSolution
+    parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None
 ) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     new_perm = [
@@ -107,7 +107,7 @@ def extract_and_random_pick(
 
 
 def choice_from_one_order_from_other(
-    parent1: PermSolution, parent2: PermSolution
+    parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None
 ) -> PermSolution:
     """Copy choice of the first parent and base the order by the order of second parent.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!
