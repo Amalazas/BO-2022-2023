@@ -1,11 +1,20 @@
 from copy import copy
 from random import uniform
-from bitarray import bitarray
 
+from bitarray import bitarray
 from generator import PermSolution, distance, generate_initial_solutions
 
 
-def halve_and_swap(parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None) -> PermSolution:
+def halve_and_swap(
+    parent1: PermSolution,
+    parent2: PermSolution,
+    packs=None,
+    V=None,
+    M=None,
+    D=None,
+    h=None,
+    start_address=None,
+) -> PermSolution:
     """Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!"""
 
@@ -62,7 +71,14 @@ def halve_and_swap(parent1: PermSolution, parent2: PermSolution, packs=None, V=N
 
 
 def extract_and_random_pick(
-    parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None
+    parent1: PermSolution,
+    parent2: PermSolution,
+    packs=None,
+    V=None,
+    M=None,
+    D=None,
+    h=None,
+    start_address=None,
 ) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     new_perm = [
@@ -77,29 +93,23 @@ def extract_and_random_pick(
         m += packs[pckg_idx][1]
         v += packs[pckg_idx][2]
 
-    for i in range(len(new_perm) - 1):
-        d += distance(packs[new_perm[i]][3], packs[new_perm[i + 1]][3])
+    for i in range(len(new_perm)):
+        if i - 1 < 0:
+            d += distance(start_address, packs[new_perm[i]][3])
+        else:
+            d += distance(packs[new_perm[i - 1]][3], packs[new_perm[i]][3])
 
     for pckg_idx in left_packages:
         _, pckg_m, pckg_v, (x, y), _ = packs[pckg_idx]
-        if (
-            v + pckg_v <= V
-            and m + pckg_m <= M
-            and d
-            + distance(packs[new_perm[-1]][3], (x, y))
-            + distance((x, y), packs[new_perm[0]][3])
-            <= D
-        ):
-            new_perm.append(pckg_idx)
 
-        v += pckg_v
-        m += pckg_m
-        d += distance(packs[new_perm[-1]][3], (x, y)) + distance(
-            (x, y), packs[new_perm[0]][3]
-        )
-        # Random exit (trying to stop putting every package we can)
-        if uniform(0,1) <= 0.33:
-            break
+        last_point = packs[new_perm[-1]][3] if new_perm else start_address
+
+        new_dist = d + distance(last_point, (x, y)) + distance((x, y), start_address)
+        if v + pckg_v <= V and m + pckg_m <= M and new_dist <= D:
+            new_perm.append(pckg_idx)
+            v += pckg_v
+            m += pckg_m
+            d = new_dist
 
     new_choice = bitarray(len(parent1.choice))
     new_choice.setall(0)
@@ -110,7 +120,14 @@ def extract_and_random_pick(
 
 
 def choice_from_one_order_from_other(
-    parent1: PermSolution, parent2: PermSolution, packs=None, V=None, M=None, D=None, h=None, start_address=None
+    parent1: PermSolution,
+    parent2: PermSolution,
+    packs=None,
+    V=None,
+    M=None,
+    D=None,
+    h=None,
+    start_address=None,
 ) -> PermSolution:
     """Copy choice of the first parent and base the order by the order of second parent.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!

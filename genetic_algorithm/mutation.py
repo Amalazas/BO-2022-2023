@@ -1,8 +1,8 @@
 import random
-from typing import Any
 from random import randint
-from bitarray import bitarray
+from typing import Any
 
+from bitarray import bitarray
 from generator import PermSolution
 
 
@@ -38,7 +38,10 @@ def shift_block(individual: PermSolution) -> None:
         shift_block += individual.perm[:end_shift_block_idx]
         insert_idx = 0
     else:
-        rest_block = individual.perm[:block_start_idx] + individual.perm[block_start_idx + shift_block_len :]
+        rest_block = (
+            individual.perm[:block_start_idx]
+            + individual.perm[block_start_idx + shift_block_len :]
+        )
         insert_idx = block_start_idx
 
     shift_postitions = random.randint(1, len(rest_block) - 1)
@@ -53,7 +56,9 @@ def shuffle_block(individual: PermSolution) -> None:
 
     block_start_idx = random.randint(0, perm_len - 1)
     shuffle_block_len = random.randint(2, perm_len)
-    shuffle_block = individual.perm[block_start_idx : block_start_idx + shuffle_block_len]
+    shuffle_block = individual.perm[
+        block_start_idx : block_start_idx + shuffle_block_len
+    ]
 
     if len(shuffle_block) != shuffle_block_len:
         shuffle_block += individual.perm[: shuffle_block_len - len(shuffle_block)]
@@ -61,12 +66,14 @@ def shuffle_block(individual: PermSolution) -> None:
     random.shuffle(shuffle_block)
 
     elems_to_end = len(individual.perm) - block_start_idx
-    individual.perm[block_start_idx : block_start_idx + shuffle_block_len] = shuffle_block[
-        :elems_to_end
-    ]
+    individual.perm[
+        block_start_idx : block_start_idx + shuffle_block_len
+    ] = shuffle_block[:elems_to_end]
 
     if elems_to_end < len(shuffle_block):
-        individual.perm[: len(shuffle_block) - elems_to_end] = shuffle_block[elems_to_end:]
+        individual.perm[: len(shuffle_block) - elems_to_end] = shuffle_block[
+            elems_to_end:
+        ]
 
 
 def inverse_packages(individual: PermSolution) -> None:
@@ -90,7 +97,7 @@ def inverse_packages(individual: PermSolution) -> None:
 
 
 def cut_out_packs(individual: PermSolution) -> None:
-    """ Cut out random number of packs from solution """
+    """Cut out random number of packs from solution"""
     nr_of_chosen_packs = 0
     chosen_indexes = []
     for index, bit in enumerate(individual.choice):
@@ -99,29 +106,30 @@ def cut_out_packs(individual: PermSolution) -> None:
             chosen_indexes.append(index)
 
     cut_off_ratio = 0.33  # How much do we want this to cut out off the gathered amount?
-    nr_of_packs_to_cut = randint(0, round(nr_of_chosen_packs*cut_off_ratio))
+    nr_of_packs_to_cut = randint(0, round(nr_of_chosen_packs * cut_off_ratio))
     for _ in range(nr_of_packs_to_cut):
         index = random.choice(chosen_indexes)
         chosen_indexes.remove(index)
         individual.choice[index] = 0
         individual.perm.remove(index)
-    
 
 
 def add_packs(individual: PermSolution) -> None:
-    """ Add random number of packs to the solution (place new pack into order randomly)"""
+    """Add random number of packs to the solution (place new pack into order randomly)"""
     not_chosen_indexes = []
     for index, bit in enumerate(individual.choice):
         if bit == 0:
             not_chosen_indexes.append(index)
-    
+
     add_max_ratio = 0.20  # How much do we want to add at maximum?
-    nr_of_packs_to_add = randint(0, round(len(individual.choice)*add_max_ratio))
+    nr_of_packs_to_add = randint(0, round(len(individual.choice) * add_max_ratio))
     for _ in range(nr_of_packs_to_add):
         index = random.choice(not_chosen_indexes)
         not_chosen_indexes.remove(index)
         individual.choice[index] = 0
-        individual.perm.insert(random.randint(0, len(individual.perm)), index)  # Adding the new package in the random place in the permutation
+        individual.perm.insert(
+            random.randint(0, len(individual.perm)), index
+        )  # Adding the new package in the random place in the permutation
 
 
 if __name__ == "__main__":
