@@ -57,7 +57,7 @@ class GeneticAlgorithm:
         elitism_rate=0.1,
         crossover_max_attempts=1000,
         mutation_max_attempts=1000,
-        log_every=10,
+        log_every=1,
     ):
         self.population = []
         self.max_volume = max_volume
@@ -82,6 +82,7 @@ class GeneticAlgorithm:
         self.best_score = float("inf")
         self.best_individual = None
         self.scores = []
+        self.priority_packs_indexes = (pack[0] for pack in packs if pack[4] != 0)
 
     def run(self):
         """Runs the genetic algorithm."""
@@ -89,7 +90,7 @@ class GeneticAlgorithm:
         for i in range(self.max_generations):
             if i % self.log_every == 0:
                 print(
-                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score} | Generation best score: {self._fitness(self.population[0])}"
+                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 20} | Current generation best score: {self._fitness(self.population[0])}"
                 )
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
@@ -128,6 +129,9 @@ class GeneticAlgorithm:
             if i in seen:
                 return False
             seen.add(i)
+        for i in self.priority_packs_indexes:
+            if individual.choice[i] == 0:
+                return False
         if len(individual.perm) < self.min_chosen_packs:
             return False
         if sum(self.packs[i][1] for i in individual.perm) > self.max_weight:
@@ -297,7 +301,7 @@ if __name__ == "__main__":
         packs,
         population_size=1500,
         max_generations=300,
-        mutation_rate=0.9,
+        mutation_rate=0.2,
         elitism_rate=0.25,
         crossover_max_attempts=10,
         mutation_max_attempts=10,
