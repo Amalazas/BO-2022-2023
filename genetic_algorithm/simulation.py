@@ -1,4 +1,7 @@
 import random
+import time
+from itertools import permutations
+from bitarray import bitarray
 
 import matplotlib.pyplot as plt
 from cross import (
@@ -271,9 +274,29 @@ class GeneticAlgorithm:
         plt.plot(x, self.scores)
         plt.show()
 
+    def exact_solution(self):
+        """Brute force solution. Returns the exact solution of the problem. Works in reasonable time for small amount of packs."""
+        start = time.time()
+        best_individual = None
+        best_score = float("inf")
+        for i in range(self.min_chosen_packs, len(self.packs) + 1):
+            for perm in permutations(range(len(self.packs)), i):
+                choice = bitarray(len(self.packs))
+                choice.setall(0)
+                for j in perm:
+                    choice[j] = 1
+                individual = PermSolution(choice, perm)
+                if self._verify(individual):
+                    score = self._fitness(individual)
+                    if score < best_score:
+                        best_score = score
+                        best_individual = individual
+        print(f"Real solution: {best_individual} | {best_score}")
+        end = time.time()
+        print(f"Calculation time: {end - start}")
+
 
 if __name__ == "__main__":
-
     max_volume = 100
     max_weight = 120
     max_distance = 180
@@ -310,7 +333,7 @@ if __name__ == "__main__":
         (26, 4, 6, (16, 7), 0),
         (27, 4, 2, (28, 18), 0),
         (28, 2, 5, (15, 17), 0),
-        (29, 5, 1, (16, 9), 0)
+        (29, 5, 1, (16, 9), 0),
     ]
 
     ga = GeneticAlgorithm(
@@ -328,6 +351,8 @@ if __name__ == "__main__":
         mutation_max_attempts=10,
         alpha=2,
     )
+    # Don't use it for number of packs greater than 10. For 10 packs it takes about 1 minute, but time complexity is factorial.
+    # ga.exact_solution()
     ga.run()
     print(f"Last Population's best individual:\n{ga.best_individual}")
     # ga.display()
