@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from generator import PermSolution
 from generator import generate_initial_solutions, distance
 from cross import halve_and_swap, choice_from_one_order_from_other, extract_and_random_pick
-from mutation import inverse_permutation, shift_block, shuffle_block, inverse_packages
+from mutation import inverse_permutation, shift_block, shuffle_block, inverse_packages, add_packs, cut_out_packs
 
 class GeneticAlgorithm:
     """
@@ -111,7 +111,7 @@ class GeneticAlgorithm:
     def _select(self):
         """Selects individuals for crossover. Mixed elitisim and roulette wheel selection. Returns a list of selected parents."""
         elitism_count = int(self.elitism_rate * self.population_size)
-        selected_elites = self.population[self.population_size - elitism_count:]
+        selected_elites = self.population[:self.population_size - elitism_count]
         selected_parents = self._roulette_wheel_selection(self.population_size - elitism_count)
         selected_parents.extend(selected_elites)
         return selected_parents
@@ -126,8 +126,7 @@ class GeneticAlgorithm:
         """Performs crossover on selected parents. If crossover fails more than crossover_max_attempts then the parent is added to the children."""
         children = []
         for i in range(0, len(parents) - 1, 2):
-            cross_func = extract_and_random_pick
-            #cross_func = self.crossover_function if self.crossover_function is not None else random.choice([halve_and_swap, extract_and_random_pick, choice_from_one_order_from_other])
+            cross_func = self.crossover_function if self.crossover_function is not None else random.choice([halve_and_swap, extract_and_random_pick, choice_from_one_order_from_other])
             for parent_a, parent_b in [(parents[i], parents[i+1]), (parents[i+1], parents[i])]:
                 for _ in range(self.crossover_max_attempts):
                     child = cross_func(parent_a, parent_b, self.packs, self.max_volume, self.max_weight, self.max_distance, self.min_chosen_packs, self.start_address)
@@ -135,7 +134,7 @@ class GeneticAlgorithm:
                         children.append(child)
                         break
                 else:
-                    print('Crossover failed.')
+                    # print('Crossover failed.')
                     children.append(parent_a)
         return children
     
@@ -143,8 +142,7 @@ class GeneticAlgorithm:
         """Performs mutation on selected children. If mutation fails more than mutation_max_attempts then the child is not mutated."""
         for i in range(len(children)):
             if random.random() < self.mutation_rate:
-                mutate_func = inverse_permutation
-                # mutate_func = self.mutation_function if self.mutation_function is not None else random.choice([inverse_permutation, shift_block, shuffle_block, inverse_packages])
+                mutate_func = self.mutation_function if self.mutation_function is not None else random.choice([inverse_permutation, shift_block, shuffle_block, inverse_packages, cut_out_packs, add_packs])
                 for _ in range(self.mutation_max_attempts):
                     child_copy = PermSolution(children[i].choice.copy(), children[i].perm.copy())
                     mutate_func(child_copy)
@@ -152,8 +150,9 @@ class GeneticAlgorithm:
                         children[i] = child_copy
                         break
                 else:
-                    print('Mutation failed.')
-    
+                    # print('Mutation failed.')
+                    pass
+
     def _replace(self, crossed_children):
         """Replaces the population with the children."""
         self.population = sorted(crossed_children, key=self._fitness)
@@ -191,6 +190,15 @@ if __name__ == '__main__':
     ]
 
 
-    ga = GeneticAlgorithm(max_volume, max_weight, max_distance, min_chosen_packs, start_address, packs)
+    ga = GeneticAlgorithm(max_volume, max_weight, max_distance, min_chosen_packs, start_address, packs, 
+                          population_size=1500, 
+                          max_generations=300, 
+                          mutation_rate=0.2,
+                          elitism_rate=0.25, 
+                          crossover_max_attempts=10,
+                          mutation_max_attempts=10,
+                          alpha=1.25
+                          )
     ga.run()
+    print(f"Last Population's best individual:\n{ga.best_individual}")
     # ga.display()

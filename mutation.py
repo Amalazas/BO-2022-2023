@@ -1,6 +1,6 @@
 import random
 from typing import Any
-
+from random import randint
 from bitarray import bitarray
 
 from generator import PermSolution
@@ -89,6 +89,41 @@ def inverse_packages(individual: PermSolution) -> None:
             break
 
 
+def cut_out_packs(individual: PermSolution) -> None:
+    """ Cut out random number of packs from solution """
+    nr_of_chosen_packs = 0
+    chosen_indexes = []
+    for index, bit in enumerate(individual.choice):
+        if bit == 1:
+            nr_of_chosen_packs += 1
+            chosen_indexes.append(index)
+
+    cut_off_ratio = 0.33  # How much do we want this to cut out off the gathered amount?
+    nr_of_packs_to_cut = randint(0, round(nr_of_chosen_packs*cut_off_ratio))
+    for _ in range(nr_of_packs_to_cut):
+        index = random.choice(chosen_indexes)
+        chosen_indexes.remove(index)
+        individual.choice[index] = 0
+        individual.perm.remove(index)
+    
+
+
+def add_packs(individual: PermSolution) -> None:
+    """ Add random number of packs to the solution (place new pack into order randomly)"""
+    not_chosen_indexes = []
+    for index, bit in enumerate(individual.choice):
+        if bit == 0:
+            not_chosen_indexes.append(index)
+    
+    add_max_ratio = 0.20  # How much do we want to add at maximum?
+    nr_of_packs_to_add = randint(0, round(len(individual.choice)*add_max_ratio))
+    for _ in range(nr_of_packs_to_add):
+        index = random.choice(not_chosen_indexes)
+        not_chosen_indexes.remove(index)
+        individual.choice[index] = 0
+        individual.perm.insert(random.randint(0, len(individual.perm)), index)  # Adding the new package in the random place in the permutation
+
+
 if __name__ == "__main__":
     perm_sol = PermSolution(choice=bitarray("0011110101"), perm=[9, 2, 5, 3, 4, 7])
 
@@ -96,5 +131,7 @@ if __name__ == "__main__":
     # inverse_delivery_order(perm_sol)
     # shift_delivery_order_block(perm_sol)
     # shuffle_block(perm_sol.perm)
-    inverse_packages(perm_sol)
+    # inverse_packages(perm_sol)
+    # cut_out_packs(perm_sol)
+    add_packs(perm_sol)
     print(perm_sol)

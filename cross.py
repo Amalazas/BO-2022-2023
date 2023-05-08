@@ -1,5 +1,5 @@
 from copy import copy
-
+from random import uniform
 from bitarray import bitarray
 
 from generator import PermSolution, distance, generate_initial_solutions
@@ -97,6 +97,9 @@ def extract_and_random_pick(
         d += distance(packs[new_perm[-1]][3], (x, y)) + distance(
             (x, y), packs[new_perm[0]][3]
         )
+        # Random exit (trying to stop putting every package we can)
+        if uniform(0,1) <= 0.33:
+            break
 
     new_choice = bitarray(len(parent1.choice))
     new_choice.setall(0)

@@ -119,16 +119,16 @@ if __name__  == "__main__":
     map = [['-' for _ in range(max_y)] for _ in range(max_x)]
     map[start_address[0]][start_address[1]] = 'X'
     for pack in packs:
-        map[pack[3][0]][pack[3][1]] = '0'
+        map[pack[3][0]][pack[3][1]] = pack[0]
     for row in map:
         for el in row:
             print(el, end=' ')
         print()
 
     # Generates and prints first batch of solutions
-    print("\n\nFirst Generation:")
-    solutions = generate_initial_solutions(V, M, D, h, start_address, packs, 20)
-    solutions_matrices = solutions_to_matrices(solutions, len(packs))
-    for i in range(len(solutions)):
-        print(solutions[i])
-        print(solutions_matrices[i])
+    # print("\n\nFirst Generation:")
+    # solutions = generate_initial_solutions(V, M, D, h, start_address, packs, 20)
+    # solutions_matrices = solutions_to_matrices(solutions, len(packs))
+    # for i in range(len(solutions)):
+    #     print(solutions[i])
+    #     print(solutions_matrices[i])
