@@ -108,6 +108,8 @@ def cut_out_packs(individual: PermSolution) -> None:
     cut_off_ratio = 0.33  # How much do we want this to cut out off the gathered amount?
     nr_of_packs_to_cut = randint(0, round(nr_of_chosen_packs * cut_off_ratio))
     for _ in range(nr_of_packs_to_cut):
+        if len(chosen_indexes) == 0:
+            return
         index = random.choice(chosen_indexes)
         chosen_indexes.remove(index)
         individual.choice[index] = 0
@@ -124,6 +126,8 @@ def add_packs(individual: PermSolution) -> None:
     add_max_ratio = 0.20  # How much do we want to add at maximum?
     nr_of_packs_to_add = randint(0, round(len(individual.choice) * add_max_ratio))
     for _ in range(nr_of_packs_to_add):
+        if len(not_chosen_indexes) == 0:
+            return
         index = random.choice(not_chosen_indexes)
         not_chosen_indexes.remove(index)
         individual.choice[index] = 0
