@@ -1,9 +1,10 @@
 import random
 import time
 from itertools import permutations
-from bitarray import bitarray
 
 import matplotlib.pyplot as plt
+import networkx as nx
+from bitarray import bitarray
 from cross import (
     choice_from_one_order_from_other,
     extract_and_random_pick,
@@ -86,6 +87,12 @@ class GeneticAlgorithm:
         self.best_individual = None
         self.scores = []
         self.priority_packs_indexes = (pack[0] for pack in packs if pack[4] != 0)
+
+        self.G = nx.Graph()
+        self.packages_positions = [pckg[3] for pckg in self.packs]
+        self.G.add_node(self.start_address)
+        self.G.add_nodes_from(self.packages_positions)
+        self.pos = dict(zip(self.G.nodes, [start_address] + self.packages_positions))
 
     def run(self):
         """Runs the genetic algorithm."""
@@ -274,6 +281,62 @@ class GeneticAlgorithm:
         plt.plot(x, self.scores)
         plt.show()
 
+    def display_solution(self, permutation: list[int]) -> None:
+        _, ax = plt.subplots()
+
+        n = len(permutation)
+        edges = [
+            (start_address, self.packages_positions[permutation[0]]),
+            (start_address, self.packages_positions[permutation[-1]]),
+        ]
+        visited_nodes = set([start_address])
+        for i in range(n - 1):
+            edges.append(
+                (
+                    self.packages_positions[permutation[i]],
+                    self.packages_positions[permutation[i + 1]],
+                )
+            )
+            visited_nodes.add(self.packages_positions[permutation[i]])
+            visited_nodes.add(self.packages_positions[permutation[i + 1]])
+
+        self.G.add_edges_from(edges)
+
+        nx.draw_networkx_nodes(self.G, pos=self.pos, ax=ax, node_size=250)
+        nx.draw_networkx_nodes(
+            self.G,
+            pos=self.pos,
+            ax=ax,
+            nodelist=visited_nodes,
+            node_size=250,
+            node_color="r",
+        )
+        nx.draw_networkx_nodes(
+            self.G,
+            pos=self.pos,
+            ax=ax,
+            nodelist=[start_address],
+            node_color="g",
+            node_size=250,
+        )
+        nx.draw_networkx_edges(self.G, pos=self.pos, ax=ax, width=2)
+
+        labels = {
+            node: (index if index >= 0 else "S")
+            for index, node in enumerate(self.G.nodes, start=-1)
+        }
+        nx.draw_networkx_labels(
+            self.G,
+            pos=self.pos,
+            labels=labels,
+            font_color="black",
+            font_size=10,
+            font_weight="bold",
+            ax=ax,
+        )
+
+        plt.show()
+
     def exact_solution(self):
         """Brute force solution. Returns the exact solution of the problem. Works in reasonable time for small amount of packs."""
         start = time.time()
@@ -306,7 +369,7 @@ if __name__ == "__main__":
     packs = [
         (0, 2, 1, (5, 25), 0),
         (1, 4, 8, (5, 1), 0),
-        (2, 2, 10, (9, 15), 0),
+        (2, 2, 10, (9, 14), 0),
         (3, 2, 7, (14, 13), 0),
         (4, 2, 2, (23, 29), 0),
         (5, 2, 8, (23, 14), 0),
@@ -314,7 +377,7 @@ if __name__ == "__main__":
         (7, 4, 5, (28, 27), 0),
         (8, 1, 3, (2, 14), 0),
         (9, 3, 7, (20, 5), 0),
-        (10, 4, 1, (7, 7), 0),
+        (10, 4, 1, (7, 6), 0),
         (11, 5, 1, (16, 26), 0),
         (12, 8, 6, (17, 29), 0),
         (13, 1, 1, (25, 21), 1),
@@ -324,14 +387,14 @@ if __name__ == "__main__":
         (17, 3, 8, (9, 23), 0),
         (18, 8, 6, (28, 7), 0),
         (19, 8, 9, (7, 29), 0),
-        (20, 8, 1, (9, 15), 0),
+        (20, 8, 1, (9, 17), 0),
         (21, 3, 1, (2, 24), 0),
-        (22, 7, 8, (27, 27), 0),
+        (22, 7, 8, (25, 27), 0),
         (23, 8, 1, (5, 12), 0),
         (24, 1, 4, (13, 2), 0),
         (25, 6, 4, (6, 15), 1),
-        (26, 4, 6, (16, 7), 0),
-        (27, 4, 2, (28, 18), 0),
+        (26, 4, 6, (16, 6), 0),
+        (27, 4, 2, (28, 20), 0),
         (28, 2, 5, (15, 17), 0),
         (29, 5, 1, (16, 9), 0),
     ]
@@ -355,4 +418,5 @@ if __name__ == "__main__":
     # ga.exact_solution()
     ga.run()
     print(f"Last Population's best individual:\n{ga.best_individual}")
+    ga.display_solution(ga.best_individual.perm)
     # ga.display()
