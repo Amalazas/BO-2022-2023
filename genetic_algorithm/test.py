@@ -47,7 +47,9 @@ if __name__ == "__main__":
             print(el, end=' ')
         print()
 
-    # Prints packs
+    # Prints generated test (input)
     print("\n\n")
+    print(f"{start_address[0]} {start_address[0]}")
+    print(f"{V} {M} {D} {h}")
     for pack in packs:
-        print(f"{pack},")
+        print(f"{pack[0]} {pack[1]} {pack[2]} {pack[3][0]} {pack[3][1]} {pack[4]}")

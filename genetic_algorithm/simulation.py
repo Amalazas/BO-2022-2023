@@ -286,10 +286,10 @@ class GeneticAlgorithm:
 
         n = len(permutation)
         edges = [
-            (start_address, self.packages_positions[permutation[0]]),
-            (start_address, self.packages_positions[permutation[-1]]),
+            (self.start_address, self.packages_positions[permutation[0]]),
+            (self.start_address, self.packages_positions[permutation[-1]]),
         ]
-        visited_nodes = set([start_address])
+        visited_nodes = set([self.start_address])
         for i in range(n - 1):
             edges.append(
                 (
@@ -315,7 +315,7 @@ class GeneticAlgorithm:
             self.G,
             pos=self.pos,
             ax=ax,
-            nodelist=[start_address],
+            nodelist=[self.start_address],
             node_color="g",
             node_size=250,
         )
