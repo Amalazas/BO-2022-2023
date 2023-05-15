@@ -17,7 +17,7 @@ def generate_packs(max_x, max_y, V, M, count):
             randint(1, max_pack_mass),
             randint(1, max_pack_volume),
             (randint(0, max_x-1), randint(0, max_y-1)),
-            1 if (uniform(0, 1) < 0.1) else 0
+            1 if (uniform(0, 1) < 0.25) else 0
         )
         packs.append(pack)
 

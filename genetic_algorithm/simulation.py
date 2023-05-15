@@ -88,7 +88,7 @@ class GeneticAlgorithm:
         self.scores = []
         self.priority_packs_indexes = (pack[0] for pack in packs if pack[4] != 0)
 
-        self.G = nx.Graph()
+        self.G = nx.DiGraph()
         self.packages_positions = [pckg[3] for pckg in self.packs]
         self.G.add_node(self.start_address)
         self.G.add_nodes_from(self.packages_positions)
@@ -292,7 +292,7 @@ class GeneticAlgorithm:
         n = len(permutation)
         edges = [
             (self.start_address, self.packages_positions[permutation[0]]),
-            (self.start_address, self.packages_positions[permutation[-1]]),
+            (self.packages_positions[permutation[-1]], self.start_address),
         ]
         visited_nodes = set([self.start_address])
         for i in range(n - 1):
@@ -364,6 +364,21 @@ class GeneticAlgorithm:
         print(f"Real solution: {best_individual} | {best_score}")
         end = time.time()
         print(f"Calculation time: {end - start}")
+
+
+    def solution_stats(self, solution:PermSolution):
+        """ Returns statisitcs describint weight, volume, distance and amount of chosen packs in given solution and problem. """
+        if len(solution.perm) != 0:
+            total_weight = sum(self.packs[i][1] for i in solution.perm)
+            total_volume = sum(self.packs[i][2] for i in solution.perm)
+            total_distance = 0
+            for i in range(1, len(solution.perm)):
+                total_distance += distance(
+                    self.packs[solution.perm[i - 1]][3],
+                    self.packs[solution.perm[i]][3],
+                )
+            pack_count = len(solution.perm)
+        return f"{total_weight=} {total_volume=} {total_distance=} {pack_count=}"
 
 
 if __name__ == "__main__":

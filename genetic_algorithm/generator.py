@@ -37,9 +37,28 @@ def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
     solutions = []
     sol_generated_count = 0
     generation_attempts_count = 0
-    
+    updated_at = 0
+    updated = False
+
     while sol_generated_count <= amount:
         
+        # Printing updates on the initial soultion generation
+        if sol_generated_count >= 0.8 * amount and updated_at < 0.8:
+            updated_at = 0.8
+            updated = True
+        elif sol_generated_count >= 0.6 * amount and updated_at < 0.6:
+            updated_at = 0.6
+            updated = True
+        elif sol_generated_count >= 0.4 * amount and updated_at < 0.4:
+            updated_at = 0.4
+            updated = True
+        elif sol_generated_count >= 0.2 * amount and updated_at < 0.2:
+            updated_at = 0.2
+            updated = True
+        if updated:
+            print(f"Generated {updated_at * 100}% of initial population...")
+            updated = False
+
         choice = bitarray(len(packs))
         choice.setall(0)
         for i, pack in enumerate(packs):  # Making sure that the packs with priority flag are selected

@@ -240,6 +240,9 @@ class GUI:
         self.mutation_max_attempts_var.set(10)
         self.log_every_var.set(1)
 
+        self.crossover_function_label_combo.set("random")
+        self.mutation_function_label_combo.set("random")
+
     def run(self):
         """Runs the GUI."""
         self.root.mainloop()
@@ -302,6 +305,7 @@ class GUI:
                 row=0, column=4, padx=5, pady=5, sticky="nsew", columnspan=3, rowspan=18
             )
             print(self.ga.best_individual)
+            print(f"Stats: {self.ga.solution_stats(self.ga.best_individual)}")
             fig1 = self.ga.display_solution(self.ga.best_individual.perm, display=False)
             fig2 = self.ga.display(display=False)
             canvas1 = FigureCanvasTkAgg(fig1, master=self.results_frame)
