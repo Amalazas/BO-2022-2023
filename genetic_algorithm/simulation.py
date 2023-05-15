@@ -1,7 +1,7 @@
 import random
 import time
 from itertools import permutations
-
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import networkx as nx
 from bitarray import bitarray
@@ -100,7 +100,7 @@ class GeneticAlgorithm:
         for i in range(self.max_generations):
             if i % self.log_every == 0:
                 print(
-                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 20} | Current generation best score: {self._fitness(self.population[0])}"
+                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10}"
                 )
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
@@ -275,14 +275,19 @@ class GeneticAlgorithm:
             self.best_individual = self.population[0]
         self.scores.append(self.best_score)
 
-    def display(self):
+    def display(self, display=True) -> Figure:
         """Displays the graph of the best score in each generation."""
-        x = [i for i in range(self.max_generations)]
-        plt.plot(x, self.scores)
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.plot([i for i in range(len(self.scores))], self.scores)
+        ax.set_xlabel("Generation")
+        ax.set_ylabel("Best score")
+        ax.set_title("Best score in each generation")
+        if display:
+            plt.show()
+        return fig
 
-    def display_solution(self, permutation: list[int]) -> None:
-        _, ax = plt.subplots()
+    def display_solution(self, permutation: list[int], display=True) -> Figure:
+        fig, ax = plt.subplots()
 
         n = len(permutation)
         edges = [
@@ -335,7 +340,9 @@ class GeneticAlgorithm:
             ax=ax,
         )
 
-        plt.show()
+        if display:
+            plt.show()
+        return fig
 
     def exact_solution(self):
         """Brute force solution. Returns the exact solution of the problem. Works in reasonable time for small amount of packs."""
@@ -419,4 +426,4 @@ if __name__ == "__main__":
     ga.run()
     print(f"Last Population's best individual:\n{ga.best_individual}")
     ga.display_solution(ga.best_individual.perm)
-    # ga.display()
+    ga.display()

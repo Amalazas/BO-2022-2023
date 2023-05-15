@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cc41d5613ad9a3417a7116efa182adbebbd97abd39682855d207821274f7f369"
+            "sha256": "a79cfa86aef20d6158dc27469914bab90a55f1c5b3fba174e89c2238e4dc2767"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -170,6 +170,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==1.0.7"
         },
+        "customtkinter": {
+            "hashes": [
+                "sha256:69a22f3ecfb6d481b566e2125acc8286f55e60c4fdc29990a4a4550250942380",
+                "sha256:f0a7ce6a66c0ebcc8f1cbd257b8f7d82c45e5f49f3bcdd98223e215e33e67961"
+            ],
+            "index": "pypi",
+            "version": "==5.1.3"
+        },
         "cycler": {
             "hashes": [
                 "sha256:3a27e95f763a428a739d2add979fa7494c912a32c17c4c38c4d5f082cad165a3",
@@ -177,6 +185,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==0.11.0"
+        },
+        "darkdetect": {
+            "hashes": [
+                "sha256:a7509ccf517eaad92b31c214f593dbcf138ea8a43b2935406bbd565e15527a85",
+                "sha256:b5428e1170263eb5dea44c25dc3895edd75e6f52300986353cd63533fe7df8b1"
+            ],
+            "markers": "python_version >= '3.6'",
+            "version": "==0.8.0"
         },
         "fonttools": {
             "hashes": [
