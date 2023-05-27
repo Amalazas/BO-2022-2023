@@ -1,4 +1,5 @@
 from bitarray import bitarray
+import math
 
 
 class Point:
@@ -8,6 +9,12 @@ class Point:
 
     def __str__(self) -> str:
         return f"({self.x}, {self.y})"
+    
+    def __iter__(self):
+        return iter((self.x, self.y))
+    
+    def distance_to(self, other_point: "Point") -> float:
+        return math.sqrt((self.x - other_point.x) ** 2 + (self.y - other_point.y) ** 2)
 
 
 class Package:
@@ -17,6 +24,9 @@ class Package:
         self.volume = volume
         self.position = position
         self.priority = priority
+    
+    def __iter__(self):
+        return iter((self.index, self.weight, self.volume, self.position, self.priority))
 
     def __str__(self) -> str:
         return f"Package {self.index} with weight {self.weight} and volume {self.volume} at {self.position} with priority {self.priority}"
