@@ -84,6 +84,9 @@ def inverse_packages(individual: PermSolution) -> None:
     taken_packages = [i for i in range(len(packages)) if packages[i] == 1]
     nontaken_packages = [i for i in range(len(packages)) if packages[i] == 0]
 
+    if not taken_packages or not nontaken_packages:
+        return None
+
     taken_package = random.choice(taken_packages)
     nontaken_package = random.choice(nontaken_packages)
 
