@@ -57,6 +57,7 @@ class GeneticAlgorithm:
         max_generations=1000,
         max_iter_no_improvement=30,
         alpha=1.15,
+        crossover_rate=0.1,
         mutation_rate=0.005,
         crossover_function=None,
         mutation_function=None,
@@ -79,6 +80,7 @@ class GeneticAlgorithm:
         self.max_generations = max_generations
         self.max_iter_no_improvement = max_iter_no_improvement
         self.alpha = alpha
+        self.crossover_rate = crossover_rate
         self.crossover_function = crossover_function
         self.mutation_function = mutation_function
         self.mutation_rate = mutation_rate
@@ -222,6 +224,9 @@ class GeneticAlgorithm:
         """Performs crossover on selected parents. If crossover fails more than crossover_max_attempts then the parent is added to the children."""
         children = []
         for i in range(0, len(parents) - 1, 2):
+            if random.random() > self.crossover_rate:
+                continue
+
             cross_func = (
                 self.crossover_function
                 if self.crossover_function is not None

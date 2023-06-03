@@ -40,7 +40,7 @@ class GUI:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.title("Input")
-        self.root.resizable(False, False)
+        # self.root.resizable(False, False)
         self.root.protocol("WM_DELETE_WINDOW", sys.exit)
         self.file_chosen = False
 
@@ -55,6 +55,7 @@ class GUI:
         self.max_generations_var = ctk.IntVar()
         self.max_iter_no_improvement = ctk.IntVar()
         self.alpha_var = ctk.DoubleVar()
+        self.crossover_rate_var = ctk.DoubleVar()
         self.mutation_rate_var = ctk.DoubleVar()
         self.elitism_rate_var = ctk.DoubleVar()
         self.crossover_max_attempts_var = ctk.IntVar()
@@ -146,88 +147,98 @@ class GUI:
         alpha_entry = ctk.CTkEntry(self.root, textvariable=self.alpha_var)
         alpha_entry.grid(row=8, column=1, padx=5, pady=5, columnspan=2, sticky="nsew")
 
+        # Crossover Rate Input
+        crossover_rate_label = ctk.CTkLabel(self.root, text="Crossover Rate")
+        crossover_rate_label.grid(row=9, column=0, padx=5, pady=5)
+        crossover_rate_entry = ctk.CTkEntry(
+            self.root, textvariable=self.crossover_rate_var
+        )
+        crossover_rate_entry.grid(
+            row=9, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+        )
+
         # Mutation Rate Input
         mutation_rate_label = ctk.CTkLabel(self.root, text="Mutation Rate")
-        mutation_rate_label.grid(row=9, column=0, padx=5, pady=5)
+        mutation_rate_label.grid(row=10, column=0, padx=5, pady=5)
         mutation_rate_entry = ctk.CTkEntry(
             self.root, textvariable=self.mutation_rate_var
         )
         mutation_rate_entry.grid(
-            row=9, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=10, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Elitism Rate Input
         elitism_rate_label = ctk.CTkLabel(self.root, text="Elitism Rate")
-        elitism_rate_label.grid(row=10, column=0, padx=5, pady=5)
+        elitism_rate_label.grid(row=11, column=0, padx=5, pady=5)
         elitism_rate_entry = ctk.CTkEntry(self.root, textvariable=self.elitism_rate_var)
         elitism_rate_entry.grid(
-            row=10, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=11, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Crossover Max Attempts Input
         crossover_max_attempts_label = ctk.CTkLabel(
             self.root, text="Crossover Max Attempts"
         )
-        crossover_max_attempts_label.grid(row=11, column=0, padx=5, pady=5)
+        crossover_max_attempts_label.grid(row=12, column=0, padx=5, pady=5)
         crossover_max_attempts_entry = ctk.CTkEntry(
             self.root, textvariable=self.crossover_max_attempts_var
         )
         crossover_max_attempts_entry.grid(
-            row=11, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=12, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Mutation Max Attempts Input
         mutation_max_attempts_label = ctk.CTkLabel(
             self.root, text="Mutation Max Attempts"
         )
-        mutation_max_attempts_label.grid(row=12, column=0, padx=5, pady=5)
+        mutation_max_attempts_label.grid(row=13, column=0, padx=5, pady=5)
         mutation_max_attempts_entry = ctk.CTkEntry(
             self.root, textvariable=self.mutation_max_attempts_var
         )
         mutation_max_attempts_entry.grid(
-            row=12, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=13, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Log Every Input
         log_every_label = ctk.CTkLabel(self.root, text="Log Every")
-        log_every_label.grid(row=13, column=0, padx=5, pady=5)
+        log_every_label.grid(row=14, column=0, padx=5, pady=5)
         log_every_entry = ctk.CTkEntry(self.root, textvariable=self.log_every_var)
         log_every_entry.grid(
-            row=13, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=14, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Crossover Function dropdown
         crossover_function_label = ctk.CTkLabel(self.root, text="Crossover Function")
-        crossover_function_label.grid(row=14, column=0, padx=5, pady=5)
+        crossover_function_label.grid(row=15, column=0, padx=5, pady=5)
         self.crossover_function_label_combo = ctk.CTkComboBox(
             self.root, values=list(CROSS_DICT.keys())
         )
         self.crossover_function_label_combo.grid(
-            row=14, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=15, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Mutation Function dropdown
         mutation_function_label = ctk.CTkLabel(self.root, text="Mutation Function")
-        mutation_function_label.grid(row=15, column=0, padx=5, pady=5)
+        mutation_function_label.grid(row=16, column=0, padx=5, pady=5)
         self.mutation_function_label_combo = ctk.CTkComboBox(
             self.root, values=list(MUTATION_DICT.keys())
         )
         self.mutation_function_label_combo.grid(
-            row=15, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=16, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Packs File Input
         packs_file_label = ctk.CTkLabel(self.root, text="Packs File")
-        packs_file_label.grid(row=16, column=0, padx=5, pady=5)
+        packs_file_label.grid(row=17, column=0, padx=5, pady=5)
         packs_file_button = ctk.CTkButton(
             self.root, text="Select File", command=self._select_file
         )
         packs_file_button.grid(
-            row=16, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=17, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
         self.packs_text = ctk.CTkTextbox(self.root)
         self.packs_text.grid(
-            row=17, column=0, padx=5, pady=5, sticky="nsew", columnspan=3
+            row=18, column=0, padx=5, pady=5, sticky="nsew", columnspan=3
         )
 
         # Run Button
@@ -235,7 +246,7 @@ class GUI:
             self.root, text="Run", command=self._run_simulation
         )
         self.run_button.grid(
-            row=18, column=0, padx=5, pady=5, columnspan=3, sticky="nsew"
+            row=19, column=0, padx=5, pady=5, columnspan=3, sticky="nsew"
         )
 
         # Default values
@@ -249,6 +260,7 @@ class GUI:
         self.max_generations_var.set(200)
         self.max_iter_no_improvement.set(30)
         self.alpha_var.set(2)
+        self.crossover_rate_var.set(0.1)
         self.mutation_rate_var.set(0.01)
         self.elitism_rate_var.set(0.1)
         self.crossover_max_attempts_var.set(10)
@@ -301,6 +313,7 @@ class GUI:
                 max_generations=self.max_generations_var.get(),
                 max_iter_no_improvement=self.max_iter_no_improvement.get(),
                 alpha=self.alpha_var.get(),
+                crossover_rate=self.crossover_rate_var.get(),
                 mutation_rate=self.mutation_rate_var.get(),
                 elitism_rate=self.elitism_rate_var.get(),
                 crossover_max_attempts=self.crossover_max_attempts_var.get(),
