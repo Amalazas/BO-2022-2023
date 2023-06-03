@@ -55,6 +55,7 @@ class GeneticAlgorithm:
         packs,
         population_size=100,
         max_generations=1000,
+        max_iter_no_improvement=30,
         alpha=1.15,
         mutation_rate=0.005,
         crossover_function=None,
@@ -76,6 +77,7 @@ class GeneticAlgorithm:
             population_size if population_size % 2 == 0 else population_size + 1
         )
         self.max_generations = max_generations
+        self.max_iter_no_improvement = max_iter_no_improvement
         self.alpha = alpha
         self.crossover_function = crossover_function
         self.mutation_function = mutation_function
@@ -98,6 +100,8 @@ class GeneticAlgorithm:
     def run(self):
         """Runs the genetic algorithm."""
         self._initialize_population()
+
+        no_improvement_iter = 0
         for i in range(self.max_generations):
             if i % self.log_every == 0:
                 print(
@@ -105,6 +109,9 @@ class GeneticAlgorithm:
                 )
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
+
+            prev_best_score = self.best_score
+
             # Selection
             selected_parents = self._select()
             # Crossover
@@ -113,6 +120,14 @@ class GeneticAlgorithm:
             self._mutate(crossed_children)
             # Replacement
             self._replace(crossed_children)
+
+            if self.best_score >= prev_best_score:
+                no_improvement_iter += 1
+            else:
+                no_improvement_iter = 0
+
+            if no_improvement_iter == self.max_iter_no_improvement:
+                break
 
     def _initialize_population(self) -> None:
         """Generates initial population of size 'population_size.'"""

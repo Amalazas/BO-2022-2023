@@ -1,11 +1,12 @@
-import customtkinter as ctk
 import sys
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
+import customtkinter as ctk
 from cross import (
     choice_from_one_order_from_other,
     extract_and_random_pick,
     halve_and_swap,
 )
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from mutation import (
     add_packs,
     cut_out_packs,
@@ -52,6 +53,7 @@ class GUI:
         self.start_address_y_var = ctk.IntVar()
         self.population_size_var = ctk.IntVar()
         self.max_generations_var = ctk.IntVar()
+        self.max_iter_no_improvement = ctk.IntVar()
         self.alpha_var = ctk.DoubleVar()
         self.mutation_rate_var = ctk.DoubleVar()
         self.elitism_rate_var = ctk.DoubleVar()
@@ -126,94 +128,106 @@ class GUI:
             row=6, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
+        # Max Iter w/o Improvement Input
+        max_iter_no_improvement = ctk.CTkLabel(
+            self.root, text="Max Iter w/o Improvement"
+        )
+        max_iter_no_improvement.grid(row=7, column=0, padx=5, pady=5)
+        max_iter_no_improvement = ctk.CTkEntry(
+            self.root, textvariable=self.max_iter_no_improvement
+        )
+        max_iter_no_improvement.grid(
+            row=7, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+        )
+
         # Alpha Input
         alpha_label = ctk.CTkLabel(self.root, text="Alpha")
-        alpha_label.grid(row=7, column=0, padx=5, pady=5)
+        alpha_label.grid(row=8, column=0, padx=5, pady=5)
         alpha_entry = ctk.CTkEntry(self.root, textvariable=self.alpha_var)
-        alpha_entry.grid(row=7, column=1, padx=5, pady=5, columnspan=2, sticky="nsew")
+        alpha_entry.grid(row=8, column=1, padx=5, pady=5, columnspan=2, sticky="nsew")
 
         # Mutation Rate Input
         mutation_rate_label = ctk.CTkLabel(self.root, text="Mutation Rate")
-        mutation_rate_label.grid(row=8, column=0, padx=5, pady=5)
+        mutation_rate_label.grid(row=9, column=0, padx=5, pady=5)
         mutation_rate_entry = ctk.CTkEntry(
             self.root, textvariable=self.mutation_rate_var
         )
         mutation_rate_entry.grid(
-            row=8, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=9, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Elitism Rate Input
         elitism_rate_label = ctk.CTkLabel(self.root, text="Elitism Rate")
-        elitism_rate_label.grid(row=9, column=0, padx=5, pady=5)
+        elitism_rate_label.grid(row=10, column=0, padx=5, pady=5)
         elitism_rate_entry = ctk.CTkEntry(self.root, textvariable=self.elitism_rate_var)
         elitism_rate_entry.grid(
-            row=9, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=10, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Crossover Max Attempts Input
         crossover_max_attempts_label = ctk.CTkLabel(
             self.root, text="Crossover Max Attempts"
         )
-        crossover_max_attempts_label.grid(row=10, column=0, padx=5, pady=5)
+        crossover_max_attempts_label.grid(row=11, column=0, padx=5, pady=5)
         crossover_max_attempts_entry = ctk.CTkEntry(
             self.root, textvariable=self.crossover_max_attempts_var
         )
         crossover_max_attempts_entry.grid(
-            row=10, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=11, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Mutation Max Attempts Input
         mutation_max_attempts_label = ctk.CTkLabel(
             self.root, text="Mutation Max Attempts"
         )
-        mutation_max_attempts_label.grid(row=11, column=0, padx=5, pady=5)
+        mutation_max_attempts_label.grid(row=12, column=0, padx=5, pady=5)
         mutation_max_attempts_entry = ctk.CTkEntry(
             self.root, textvariable=self.mutation_max_attempts_var
         )
         mutation_max_attempts_entry.grid(
-            row=11, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=12, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Log Every Input
         log_every_label = ctk.CTkLabel(self.root, text="Log Every")
-        log_every_label.grid(row=12, column=0, padx=5, pady=5)
+        log_every_label.grid(row=13, column=0, padx=5, pady=5)
         log_every_entry = ctk.CTkEntry(self.root, textvariable=self.log_every_var)
         log_every_entry.grid(
-            row=12, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=13, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Crossover Function dropdown
         crossover_function_label = ctk.CTkLabel(self.root, text="Crossover Function")
-        crossover_function_label.grid(row=13, column=0, padx=5, pady=5)
+        crossover_function_label.grid(row=14, column=0, padx=5, pady=5)
         self.crossover_function_label_combo = ctk.CTkComboBox(
             self.root, values=list(CROSS_DICT.keys())
         )
         self.crossover_function_label_combo.grid(
-            row=13, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=14, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Mutation Function dropdown
         mutation_function_label = ctk.CTkLabel(self.root, text="Mutation Function")
-        mutation_function_label.grid(row=14, column=0, padx=5, pady=5)
+        mutation_function_label.grid(row=15, column=0, padx=5, pady=5)
         self.mutation_function_label_combo = ctk.CTkComboBox(
             self.root, values=list(MUTATION_DICT.keys())
         )
         self.mutation_function_label_combo.grid(
-            row=14, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=15, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
 
         # Packs File Input
         packs_file_label = ctk.CTkLabel(self.root, text="Packs File")
-        packs_file_label.grid(row=15, column=0, padx=5, pady=5)
+        packs_file_label.grid(row=16, column=0, padx=5, pady=5)
         packs_file_button = ctk.CTkButton(
             self.root, text="Select File", command=self._select_file
         )
         packs_file_button.grid(
-            row=15, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
+            row=16, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
         self.packs_text = ctk.CTkTextbox(self.root)
         self.packs_text.grid(
-            row=16, column=0, padx=5, pady=5, sticky="nsew", columnspan=3
+            row=17, column=0, padx=5, pady=5, sticky="nsew", columnspan=3
         )
 
         # Run Button
@@ -221,7 +235,7 @@ class GUI:
             self.root, text="Run", command=self._run_simulation
         )
         self.run_button.grid(
-            row=17, column=0, padx=5, pady=5, columnspan=3, sticky="nsew"
+            row=18, column=0, padx=5, pady=5, columnspan=3, sticky="nsew"
         )
 
         # Default values
@@ -233,6 +247,7 @@ class GUI:
         self.start_address_y_var.set(0)
         self.population_size_var.set(1500)
         self.max_generations_var.set(200)
+        self.max_iter_no_improvement.set(30)
         self.alpha_var.set(2)
         self.mutation_rate_var.set(0.01)
         self.elitism_rate_var.set(0.1)
@@ -284,6 +299,7 @@ class GUI:
                 packs=self.packs,
                 population_size=self.population_size_var.get(),
                 max_generations=self.max_generations_var.get(),
+                max_iter_no_improvement=self.max_iter_no_improvement.get(),
                 alpha=self.alpha_var.get(),
                 mutation_rate=self.mutation_rate_var.get(),
                 elitism_rate=self.elitism_rate_var.get(),
