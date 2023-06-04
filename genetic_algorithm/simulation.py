@@ -1,7 +1,7 @@
 import random
 import time
 from itertools import permutations
-from matplotlib.figure import Figure
+
 import matplotlib.pyplot as plt
 import networkx as nx
 from bitarray import bitarray
@@ -11,6 +11,7 @@ from cross import (
     halve_and_swap,
 )
 from generator import PermSolution, distance, generate_initial_solutions
+from matplotlib.figure import Figure
 from mutation import (
     add_packs,
     cut_out_packs,
@@ -54,7 +55,9 @@ class GeneticAlgorithm:
         packs,
         population_size=100,
         max_generations=1000,
+        max_iter_no_improvement=30,
         alpha=1.15,
+        crossover_rate=0.1,
         mutation_rate=0.005,
         crossover_function=None,
         mutation_function=None,
@@ -75,7 +78,9 @@ class GeneticAlgorithm:
             population_size if population_size % 2 == 0 else population_size + 1
         )
         self.max_generations = max_generations
+        self.max_iter_no_improvement = max_iter_no_improvement
         self.alpha = alpha
+        self.crossover_rate = crossover_rate
         self.crossover_function = crossover_function
         self.mutation_function = mutation_function
         self.mutation_rate = mutation_rate
@@ -97,6 +102,8 @@ class GeneticAlgorithm:
     def run(self):
         """Runs the genetic algorithm."""
         self._initialize_population()
+
+        no_improvement_iter = 0
         for i in range(self.max_generations):
             if i % self.log_every == 0:
                 print(
@@ -104,6 +111,9 @@ class GeneticAlgorithm:
                 )
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
+
+            prev_best_score = self.best_score
+
             # Selection
             selected_parents = self._select()
             # Crossover
@@ -112,6 +122,14 @@ class GeneticAlgorithm:
             self._mutate(crossed_children)
             # Replacement
             self._replace(crossed_children)
+
+            if self.best_score >= prev_best_score:
+                no_improvement_iter += 1
+            else:
+                no_improvement_iter = 0
+
+            if no_improvement_iter == self.max_iter_no_improvement:
+                break
 
     def _initialize_population(self) -> None:
         """Generates initial population of size 'population_size.'"""
@@ -177,7 +195,10 @@ class GeneticAlgorithm:
                     self.packs[individual.perm[i]][3],
                 )
                 total_weight -= self.packs[individual.perm[i]][1]
-            total_weight /= self.alpha ** len(individual.perm)
+
+            k, n = len(individual.perm), len(self.packs)
+            score /= (1 + k / (20 * n)) ** self.alpha
+
         return score
 
     def _select(self):
@@ -203,6 +224,9 @@ class GeneticAlgorithm:
         """Performs crossover on selected parents. If crossover fails more than crossover_max_attempts then the parent is added to the children."""
         children = []
         for i in range(0, len(parents) - 1, 2):
+            if random.random() > self.crossover_rate:
+                continue
+
             cross_func = (
                 self.crossover_function
                 if self.crossover_function is not None
@@ -365,9 +389,8 @@ class GeneticAlgorithm:
         end = time.time()
         print(f"Calculation time: {end - start}")
 
-
-    def solution_stats(self, solution:PermSolution):
-        """ Returns statisitcs describint weight, volume, distance and amount of chosen packs in given solution and problem. """
+    def solution_stats(self, solution: PermSolution):
+        """Returns statisitcs describint weight, volume, distance and amount of chosen packs in given solution and problem."""
         if len(solution.perm) != 0:
             total_weight = sum(self.packs[i][1] for i in solution.perm)
             total_volume = sum(self.packs[i][2] for i in solution.perm)
@@ -430,11 +453,11 @@ if __name__ == "__main__":
         packs,
         population_size=1500,
         max_generations=200,
-        mutation_rate=0.01,
+        mutation_rate=0.1,
         elitism_rate=0.10,
         crossover_max_attempts=10,
         mutation_max_attempts=10,
-        alpha=2,
+        alpha=150,
     )
     # Don't use it for number of packs greater than 10. For 10 packs it takes about 1 minute, but time complexity is factorial.
     # ga.exact_solution()
