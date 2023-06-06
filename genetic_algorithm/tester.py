@@ -37,7 +37,7 @@ if __name__ == "__main__":
         crossover_max_attempts,
         mutation_max_attempts
         
-        Example Run: py tester.py test_input_1.txt 1500 200 30 1.1 0.1 0.01 random random 0.2 10 10
+        Example Run: py tester.py test_input_7.txt 3000 1000 60 7.95 0.7 0.05 random add_packs 0.4 20 20
 
         """
     
