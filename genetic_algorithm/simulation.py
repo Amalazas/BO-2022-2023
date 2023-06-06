@@ -121,24 +121,33 @@ class GeneticAlgorithm:
         """Runs the genetic algorithm."""
         self._initialize_population()
 
+        if self.output_f is not None:
+            self.output_f.write(f"generation, best_score, generation_best_score, avg_population_age, new_solutions_count\n")
+
+
         no_improvement_iter = 0
         for i in range(self.max_generations):
             if i % self.log_every == 0:
                 average_population_age = self.average_population_age()
                 new_solutions_count = self.new_solutions_count()
                 print(
-                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {round(average_population_age, 4): < 16.10} | New solutions count: {new_solutions_count}"
+                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {average_population_age: < 16.10} | New solutions count: {new_solutions_count}"
                 )
                 if self.output_f is not None: 
-                    self.output_f.write(f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {round(average_population_age, 2): < 16.10} | New solutions count: {new_solutions_count}\n")
+                    self.output_f.write(f"{i: <{len(str(self.max_generations))}}, {self.best_score: < 16.10}, {self._fitness(self.population[0]): < 16.10}, {average_population_age: < 16.10}, {new_solutions_count}\n")
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
 
             prev_best_score = self.best_score
-
-            # Aging parents
+            
+            # Aging population - it seems that the solutions are stored by reference and there are multiple
+            # references to the same solutions, that's why i use the was_aged flag
             for solution in self.population:
-                solution.age += 1
+                if not solution.was_aged:
+                    solution.age += 1 
+                    solution.was_aged = True
+            for solution in self.population:
+                solution.was_aged = False
 
             # Selection
             selected_parents = self._select()
@@ -147,7 +156,7 @@ class GeneticAlgorithm:
             # Mutation
             self._mutate(crossed_children)
             # Replacement
-            self._replace(crossed_children)
+            self._replace(selected_parents, crossed_children)
 
             if self.best_score >= prev_best_score:
                 no_improvement_iter += 1
@@ -165,14 +174,14 @@ class GeneticAlgorithm:
         for key, value in self.cross_type_count.items():
             print(f"{key}: {value}")
 
-        # Saving the stats into the output file
-        if self.output_f is not None: 
-            self.output_f.write(f"Mutations:\n")
-            for key, value in self.mutation_type_count.items():
-                self.output_f.write(f"{key}: {value}\n")
-            self.output_f.write(f"Crossovers:\n")
-            for key, value in self.cross_type_count.items():
-                self.output_f.write(f"{key}: {value}\n") 
+        # # Saving the stats into the output file
+        # if self.output_f is not None: 
+        #     self.output_f.write(f"Mutations:\n")
+        #     for key, value in self.mutation_type_count.items():
+        #         self.output_f.write(f"{key}: {value}\n")
+        #     self.output_f.write(f"Crossovers:\n")
+        #     for key, value in self.cross_type_count.items():
+        #         self.output_f.write(f"{key}: {value}\n") 
 
     def _initialize_population(self) -> None:
         """Generates initial population of size 'population_size.'"""
@@ -240,7 +249,7 @@ class GeneticAlgorithm:
                 total_weight -= self.packs[individual.perm[i]][1]
 
             k, n = len(individual.perm), len(self.packs)
-            score /= (1 + k / (20 * n)) ** self.alpha
+            score /= (1 + k / n) ** self.alpha
 
         return score
 
@@ -302,7 +311,8 @@ class GeneticAlgorithm:
                         break
                 else:
                     # print('Crossover failed.')
-                    children.append(parent_a)
+                    # children.append(parent_a)
+                    pass
         return children
 
     def _mutate(self, children):
@@ -336,9 +346,9 @@ class GeneticAlgorithm:
                     # print('Mutation failed.')
                     pass
 
-    def _replace(self, crossed_children):
-        """Replaces the population with the children."""
-        self.population = sorted(crossed_children, key=self._fitness)
+    def _replace(self, parents, children):
+        """Replaces the population with the new population consisting of top parents and children."""
+        self.population = sorted(parents + children, key=self._fitness)[:len(self.population)]
         if self._fitness(self.population[0]) < self.best_score:
             self.best_score = self._fitness(self.population[0])
             self.best_individual = self.population[0]
@@ -348,7 +358,7 @@ class GeneticAlgorithm:
         sum_of_ages = 0
         for solution in self.population:
             sum_of_ages += solution.age
-        return sum_of_ages / len(self.population)
+        return (sum_of_ages / len(self.population))
     
     def new_solutions_count(self) -> int:
         count = 0

@@ -46,7 +46,7 @@ if __name__ == "__main__":
         exit()
 
     # Reading and checking if the problem file is ok
-    input = read_input_file("./input_files/" + sys.argv[1])
+    input = read_input_file("./input/" + sys.argv[1])
     if input is None:
         exit()
     
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                     + sys.argv[10] + " " \
                     + sys.argv[11] + " " \
                     + sys.argv[12] + " " \
-                    + ".txt"
+                    + ".csv"
     if not os.path.exists("./output"):
         os.makedirs("./output")
     

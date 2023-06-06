@@ -12,9 +12,11 @@ class PermSolution():
     def __init__(self, choice, perm) -> None:
         self.choice = choice
         self.perm = perm
+        self.age = 0
+        self.was_aged = False
     
     def __str__(self) -> str:
-        return f"{self.choice}, {self.perm}"
+        return f"{self.choice}, {self.perm}, {self.age}"
 
 class MatSolution():
     mat = None
