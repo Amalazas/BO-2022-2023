@@ -278,7 +278,7 @@ class GUI:
         """Opens a file dialog and loads the file."""
         filetypes = (("Text files", "*.txt"), ("All files", "*.*"))
         filename = ctk.filedialog.askopenfilename(
-            title="Open a file", initialdir="/", filetypes=filetypes
+            title="Open a file", initialdir="./", filetypes=filetypes
         )
         self.file_chosen = True
         with open(filename, "r", encoding="utf-8") as f:

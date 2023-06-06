@@ -1,0 +1,55 @@
+Generation 0   | Best score:  1225.771628     | Current generation best score:  1225.771628    
+Generation 1   | Best score:  1225.771628     | Current generation best score:  1245.063015    
+Generation 2   | Best score:  1225.771628     | Current generation best score:  1297.289413    
+Generation 3   | Best score:  1225.771628     | Current generation best score:  1297.289413    
+Generation 4   | Best score:  1225.771628     | Current generation best score:  1256.295784    
+Generation 5   | Best score:  1225.771628     | Current generation best score:  1256.295784    
+Generation 6   | Best score:  1225.771628     | Current generation best score:  1256.295784    
+Generation 7   | Best score:  1225.771628     | Current generation best score:  1256.295784    
+Generation 8   | Best score:  1200.352302     | Current generation best score:  1200.352302    
+Generation 9   | Best score:  1188.762625     | Current generation best score:  1188.762625    
+Generation 10  | Best score:  1141.070681     | Current generation best score:  1141.070681    
+Generation 11  | Best score:  1141.070681     | Current generation best score:  1159.556148    
+Generation 12  | Best score:  1141.070681     | Current generation best score:  1292.844882    
+Generation 13  | Best score:  1141.070681     | Current generation best score:  1389.815575    
+Generation 14  | Best score:  938.7095351     | Current generation best score:  938.7095351    
+Generation 15  | Best score:  938.7095351     | Current generation best score:  1322.050928    
+Generation 16  | Best score:  938.7095351     | Current generation best score:  1322.050928    
+Generation 17  | Best score:  938.7095351     | Current generation best score:  1218.080715    
+Generation 18  | Best score:  938.7095351     | Current generation best score:  1204.605806    
+Generation 19  | Best score:  938.7095351     | Current generation best score:  960.361103     
+Generation 20  | Best score:  938.7095351     | Current generation best score:  1147.714741    
+Generation 21  | Best score:  938.7095351     | Current generation best score:  1365.81409     
+Generation 22  | Best score:  938.7095351     | Current generation best score:  1461.503408    
+Generation 23  | Best score:  938.7095351     | Current generation best score:  1324.708655    
+Generation 24  | Best score:  938.7095351     | Current generation best score:  1083.82968     
+Generation 25  | Best score:  938.7095351     | Current generation best score:  1083.82968     
+Generation 26  | Best score:  938.7095351     | Current generation best score:  1216.878027    
+Generation 27  | Best score:  938.7095351     | Current generation best score:  1467.185711    
+Generation 28  | Best score:  938.7095351     | Current generation best score:  1314.477299    
+Generation 29  | Best score:  938.7095351     | Current generation best score:  1104.79575     
+Generation 30  | Best score:  938.7095351     | Current generation best score:  1110.764379    
+Generation 31  | Best score:  938.7095351     | Current generation best score:  1110.764379    
+Generation 32  | Best score:  938.7095351     | Current generation best score:  1511.465804    
+Generation 33  | Best score:  938.7095351     | Current generation best score:  1244.717838    
+Generation 34  | Best score:  938.7095351     | Current generation best score:  1244.717838    
+Generation 35  | Best score:  938.7095351     | Current generation best score:  1459.450781    
+Generation 36  | Best score:  938.7095351     | Current generation best score:  1490.603237    
+Generation 37  | Best score:  938.7095351     | Current generation best score:  1764.045463    
+Generation 38  | Best score:  938.7095351     | Current generation best score:  1244.717838    
+Generation 39  | Best score:  938.7095351     | Current generation best score:  978.3057086    
+Generation 40  | Best score:  938.7095351     | Current generation best score:  978.3057086    
+Generation 41  | Best score:  938.7095351     | Current generation best score:  1545.544884    
+Generation 42  | Best score:  938.7095351     | Current generation best score:  1646.772998    
+Generation 43  | Best score:  938.7095351     | Current generation best score:  1540.118553    
+Mutations:
+add_packs: 13
+cut_out_packs: 10
+inverse_packages: 9
+inverse_permutation: 11
+shift_block: 9
+shuffle_block: 8
+Crossovers:
+choice_from_one_order_from_other: 1957
+extract_and_random_pick: 1726
+halve_and_swap: 130

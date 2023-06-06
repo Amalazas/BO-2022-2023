@@ -65,6 +65,7 @@ class GeneticAlgorithm:
         crossover_max_attempts=1000,
         mutation_max_attempts=1000,
         log_every=1,
+        output_file=None
     ):
         self.population = []
         self.max_volume = max_volume
@@ -99,6 +100,23 @@ class GeneticAlgorithm:
         self.G.add_nodes_from(self.packages_positions)
         self.pos = dict(zip(self.G.nodes, [start_address] + self.packages_positions))
 
+        self.mutation_type_count = dict(zip(["add_packs",
+                                            "cut_out_packs",
+                                            "inverse_packages",
+                                            "inverse_permutation",
+                                            "shift_block",
+                                            "shuffle_block"],
+                                            [0 for _ in range(6)]
+                                            ))
+        
+        self.cross_type_count = dict(zip(["choice_from_one_order_from_other",
+                                          "extract_and_random_pick",
+                                          "halve_and_swap"],
+                                            [0 for _ in range(3)]
+                                            ))
+        
+        self.output_f = output_file
+
     def run(self):
         """Runs the genetic algorithm."""
         self._initialize_population()
@@ -109,6 +127,8 @@ class GeneticAlgorithm:
                 print(
                     f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10}"
                 )
+                if self.output_f is not None: 
+                    self.output_f.write(f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10}\n")
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
 
@@ -130,6 +150,23 @@ class GeneticAlgorithm:
 
             if no_improvement_iter == self.max_iter_no_improvement:
                 break
+
+        # Printing the mutations and crossover stats
+        print("Mutations:")
+        for key, value in self.mutation_type_count.items():
+            print(f"{key}: {value}")
+        print("Crossovers:")
+        for key, value in self.cross_type_count.items():
+            print(f"{key}: {value}")
+
+        # Saving the stats into the output file
+        if self.output_f is not None: 
+            self.output_f.write(f"Mutations:\n")
+            for key, value in self.mutation_type_count.items():
+                self.output_f.write(f"{key}: {value}\n")
+            self.output_f.write(f"Crossovers:\n")
+            for key, value in self.cross_type_count.items():
+                self.output_f.write(f"{key}: {value}\n") 
 
     def _initialize_population(self) -> None:
         """Generates initial population of size 'population_size.'"""
@@ -254,6 +291,7 @@ class GeneticAlgorithm:
                         self.start_address,
                     )
                     if self._verify(child):
+                        self.cross_type_count[cross_func.__name__] = self.cross_type_count[cross_func.__name__] + 1 
                         children.append(child)
                         break
                 else:
@@ -285,6 +323,7 @@ class GeneticAlgorithm:
                     )
                     mutate_func(child_copy)
                     if self._verify(child_copy):
+                        self.mutation_type_count[mutate_func.__name__] = self.mutation_type_count[mutate_func.__name__] + 1
                         children[i] = child_copy
                         break
                 else:
