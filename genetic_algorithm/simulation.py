@@ -124,15 +124,21 @@ class GeneticAlgorithm:
         no_improvement_iter = 0
         for i in range(self.max_generations):
             if i % self.log_every == 0:
+                average_population_age = self.average_population_age()
+                new_solutions_count = self.new_solutions_count()
                 print(
-                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10}"
+                    f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {round(average_population_age, 4): < 16.10} | New solutions count: {new_solutions_count}"
                 )
                 if self.output_f is not None: 
-                    self.output_f.write(f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10}\n")
+                    self.output_f.write(f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {round(average_population_age, 2): < 16.10} | New solutions count: {new_solutions_count}\n")
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
 
             prev_best_score = self.best_score
+
+            # Aging parents
+            for solution in self.population:
+                solution.age += 1
 
             # Selection
             selected_parents = self._select()
@@ -337,6 +343,19 @@ class GeneticAlgorithm:
             self.best_score = self._fitness(self.population[0])
             self.best_individual = self.population[0]
         self.scores.append(self.best_score)
+
+    def average_population_age(self) -> float:
+        sum_of_ages = 0
+        for solution in self.population:
+            sum_of_ages += solution.age
+        return sum_of_ages / len(self.population)
+    
+    def new_solutions_count(self) -> int:
+        count = 0
+        for solution in self.population:
+            if solution.age == 0:
+                count += 1
+        return count
 
     def display(self, display=True) -> Figure:
         """Displays the graph of the best score in each generation."""

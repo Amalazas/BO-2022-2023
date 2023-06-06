@@ -27,9 +27,9 @@ if __name__ == "__main__":
         problem_file_path,
         population_size,
         max_generations,
-        max_iter_no_improvement, X
+        max_iter_no_improvement,
         alpha,
-        crossover_rate, X
+        crossover_rate,
         mutation_rate,
         crossover_function,
         mutation_function,

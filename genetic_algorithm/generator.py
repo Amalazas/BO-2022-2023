@@ -7,6 +7,7 @@ from bitarray import bitarray
 class PermSolution():
     choice = None
     perm = None
+    age = 0
     
     def __init__(self, choice, perm) -> None:
         self.choice = choice
