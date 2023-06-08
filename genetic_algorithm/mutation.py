@@ -77,8 +77,7 @@ def shuffle_block(individual: PermSolution) -> None:
 
 
 def inverse_packages(individual: PermSolution) -> None:
-    """Inverses random pair of (taken, nontaken) packages
-    TODO: Implement in such a way that it is guaranteed not to produce invalid solutions???"""
+    """Inverses random pair of (taken, nontaken) packages"""
 
     packages = individual.choice
     taken_packages = [i for i in range(len(packages)) if packages[i] == 1]
@@ -137,6 +136,17 @@ def add_packs(individual: PermSolution) -> None:
         individual.perm.insert(
             random.randint(0, len(individual.perm)), index
         )  # Adding the new package in the random place in the permutation
+
+
+MUTATION_DICT = {
+    "add_packs": add_packs,
+    "cut_out_packs": cut_out_packs,
+    "inverse_packages": inverse_packages,
+    "inverse_permutation": inverse_permutation,
+    "shift_block": shift_block,
+    "shuffle_block": shuffle_block,
+    "random": None,
+}
 
 
 if __name__ == "__main__":

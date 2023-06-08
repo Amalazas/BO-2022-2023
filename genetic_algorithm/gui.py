@@ -5,6 +5,7 @@ from cross import (
     choice_from_one_order_from_other,
     extract_and_random_pick,
     halve_and_swap,
+    CROSS_DICT,
 )
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from mutation import (
@@ -14,24 +15,10 @@ from mutation import (
     inverse_permutation,
     shift_block,
     shuffle_block,
+    MUTATION_DICT,
 )
 from simulation import GeneticAlgorithm
-
-CROSS_DICT = {
-    "choice_from_one_order_from_other": choice_from_one_order_from_other,
-    "extract_and_random_pick": extract_and_random_pick,
-    "halve_and_swap": halve_and_swap,
-    "random": None,
-}
-MUTATION_DICT = {
-    "add_packs": add_packs,
-    "cut_out_packs": cut_out_packs,
-    "inverse_packages": inverse_packages,
-    "inverse_permutation": inverse_permutation,
-    "shift_block": shift_block,
-    "shuffle_block": shuffle_block,
-    "random": None,
-}
+from data_classes import Package, Point
 
 
 class GUI:
@@ -45,22 +32,22 @@ class GUI:
         self.file_chosen = False
 
         # Variables
-        self.max_volume_var = ctk.IntVar()
-        self.max_weight_var = ctk.IntVar()
-        self.max_distance_var = ctk.IntVar()
-        self.min_chosen_packs_var = ctk.IntVar()
-        self.start_address_x_var = ctk.IntVar()
-        self.start_address_y_var = ctk.IntVar()
-        self.population_size_var = ctk.IntVar()
-        self.max_generations_var = ctk.IntVar()
-        self.max_iter_no_improvement = ctk.IntVar()
-        self.alpha_var = ctk.DoubleVar()
-        self.crossover_rate_var = ctk.DoubleVar()
-        self.mutation_rate_var = ctk.DoubleVar()
-        self.elitism_rate_var = ctk.DoubleVar()
-        self.crossover_max_attempts_var = ctk.IntVar()
-        self.mutation_max_attempts_var = ctk.IntVar()
-        self.log_every_var = ctk.IntVar()
+        self.max_volume_var = ctk.StringVar()
+        self.max_weight_var = ctk.StringVar()
+        self.max_distance_var = ctk.StringVar()
+        self.min_chosen_packs_var = ctk.StringVar()
+        self.start_address_x_var = ctk.StringVar()
+        self.start_address_y_var = ctk.StringVar()
+        self.population_size_var = ctk.StringVar()
+        self.max_generations_var = ctk.StringVar()
+        self.max_iter_no_improvement = ctk.StringVar()
+        self.alpha_var = ctk.StringVar()
+        self.crossover_rate_var = ctk.StringVar()
+        self.mutation_rate_var = ctk.StringVar()
+        self.elitism_rate_var = ctk.StringVar()
+        self.crossover_max_attempts_var = ctk.StringVar()
+        self.mutation_max_attempts_var = ctk.StringVar()
+        self.log_every_var = ctk.StringVar()
         self.packs = []
 
         # Max Volume Input
@@ -226,7 +213,6 @@ class GUI:
         self.mutation_function_label_combo.grid(
             row=16, column=1, padx=5, pady=5, columnspan=2, sticky="nsew"
         )
-
         # Packs File Input
         packs_file_label = ctk.CTkLabel(self.root, text="Packs File")
         packs_file_label.grid(row=17, column=0, padx=5, pady=5)
@@ -267,8 +253,8 @@ class GUI:
         self.mutation_max_attempts_var.set(10)
         self.log_every_var.set(1)
 
-        self.crossover_function_label_combo.set("random")
-        self.mutation_function_label_combo.set("random")
+        # self.crossover_function_label_combo.set("random")
+        # self.mutation_function_label_combo.set("random")
 
     def run(self):
         """Runs the GUI."""
@@ -282,10 +268,16 @@ class GUI:
         )
         self.file_chosen = True
         with open(filename, "r", encoding="utf-8") as f:
-            x, y = map(int, f.readline().split())
+            x, y = map(float, f.readline().split())
             self.start_address_x_var.set(x)
             self.start_address_y_var.set(y)
-            volume, weight, distance, min_chosen_packs = map(int, f.readline().split())
+            volume, weight, distance, min_chosen_packs = f.readline().split()
+            volume, weight, distance, min_chosen_packs = (
+                float(volume),
+                float(weight),
+                float(distance),
+                int(min_chosen_packs),
+            )
             self.max_volume_var.set(volume)
             self.max_weight_var.set(weight)
             self.max_distance_var.set(distance)
@@ -297,28 +289,30 @@ class GUI:
         if self.file_chosen:
             self.run_button.configure(state="disabled")
             for i in self.packs_text.get("1.0", "end-1c").split("\n"):
-                index, volume, weight, x, y, fragile = map(int, i.split())
-                self.packs.append((index, volume, weight, (x, y), fragile))
+                index, volume, weight, x, y, priority = i.split()
+                volume, weight, x, y = map(float, (volume, weight, x, y))
+                index, priority = map(int, (index, priority))
+                self.packs.append(Package(index, volume, weight, (x, y), priority))
             self.ga = GeneticAlgorithm(
-                max_volume=self.max_volume_var.get(),
-                max_weight=self.max_weight_var.get(),
-                max_distance=self.max_distance_var.get(),
-                min_chosen_packs=self.min_chosen_packs_var.get(),
-                start_address=(
-                    self.start_address_x_var.get(),
-                    self.start_address_y_var.get(),
+                max_volume=float(self.max_volume_var.get()),
+                max_weight=float(self.max_weight_var.get()),
+                max_distance=float(self.max_distance_var.get()),
+                min_chosen_packs=int(self.min_chosen_packs_var.get()),
+                start_address=Point(
+                    float(self.start_address_x_var.get()),
+                    float(self.start_address_y_var.get()),
                 ),
                 packs=self.packs,
-                population_size=self.population_size_var.get(),
-                max_generations=self.max_generations_var.get(),
-                max_iter_no_improvement=self.max_iter_no_improvement.get(),
-                alpha=self.alpha_var.get(),
-                crossover_rate=self.crossover_rate_var.get(),
-                mutation_rate=self.mutation_rate_var.get(),
-                elitism_rate=self.elitism_rate_var.get(),
-                crossover_max_attempts=self.crossover_max_attempts_var.get(),
-                mutation_max_attempts=self.mutation_max_attempts_var.get(),
-                log_every=self.log_every_var.get(),
+                population_size=int(self.population_size_var.get()),
+                max_generations=int(self.max_generations_var.get()),
+                max_iter_no_improvement=int(self.max_iter_no_improvement.get()),
+                alpha=float(self.alpha_var.get()),
+                crossover_rate=float(self.crossover_rate_var.get()),
+                mutation_rate=float(self.mutation_rate_var.get()),
+                elitism_rate=float(self.elitism_rate_var.get()),
+                crossover_max_attempts=int(self.crossover_max_attempts_var.get()),
+                mutation_max_attempts=int(self.mutation_max_attempts_var.get()),
+                log_every=int(self.log_every_var.get()),
                 crossover_function=CROSS_DICT[
                     self.crossover_function_label_combo.get()
                 ],

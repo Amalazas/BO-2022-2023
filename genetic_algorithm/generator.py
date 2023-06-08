@@ -1,128 +1,101 @@
-import math
 import random
 
 from bitarray import bitarray
+from data_classes import (
+    PermSolution,
+    MatSolution,
+    Point,
+    Package,
+    convert_to_package_list,
+)
 
 
-class PermSolution():
-    choice = None
-    perm = None
-    age = 0
-    
-    def __init__(self, choice, perm) -> None:
-        self.choice = choice
-        self.perm = perm
-        self.age = 0
-        self.was_aged = False
-    
-    def __str__(self) -> str:
-        return f"{self.choice}, {self.perm}, {self.age}"
-
-class MatSolution():
-    mat = None
-    
-    def __init__(self, matrix):
-        self.mat = matrix
-    
-    def __str__(self) -> str:
-        mat_str = ""
-        for row in self.mat:
-            for el in row:
-                mat_str += str(el) + ' '
-            mat_str += '\n'
-        return mat_str
-        
-        
-def distance(p1, p2):
-    return math.sqrt( (p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
-
-def generate_initial_solutions(V, M, D, h, start_address, packs, amount=50):
+def generate_initial_solutions(
+    V: float,
+    M: float,
+    D: float,
+    h: int,
+    start_address: Point,
+    packs: list[Package],
+    amount: int = 50,
+) -> list[PermSolution]:
     solutions = []
     sol_generated_count = 0
     generation_attempts_count = 0
-    updated_at = 0
-    updated = False
 
     while sol_generated_count <= amount:
-        
-        # Printing updates on the initial soultion generation
-        if sol_generated_count >= 0.8 * amount and updated_at < 0.8:
-            updated_at = 0.8
-            updated = True
-        elif sol_generated_count >= 0.6 * amount and updated_at < 0.6:
-            updated_at = 0.6
-            updated = True
-        elif sol_generated_count >= 0.4 * amount and updated_at < 0.4:
-            updated_at = 0.4
-            updated = True
-        elif sol_generated_count >= 0.2 * amount and updated_at < 0.2:
-            updated_at = 0.2
-            updated = True
-        if updated:
-            print(f"Generated {updated_at * 100}% of initial population...")
-            updated = False
+        print(
+            f"Generated {sol_generated_count} out of {amount} initial solutions...",
+            end="\r",
+        )
 
         choice = bitarray(len(packs))
         choice.setall(0)
-        for i, pack in enumerate(packs):  # Making sure that the packs with priority flag are selected
-            if pack[4] == 1:
+        for i, pack in enumerate(
+            packs
+        ):  # Making sure that the packs with priority flag are selected
+            if pack.priority == 1:
                 choice[i] = 1
-        packs_left_index = [i for i in range(len(packs)) if packs[i][4] == 0]
+        packs_left_index = [i for i in range(len(packs)) if packs[i].priority == 0]
 
         # Random additional packs and random order
         additional_pack_count = random.randint(0, len(packs_left_index))
 
         for i in range(additional_pack_count):
             pack_nr = random.choice(packs_left_index)
-            choice[pack_nr] = 1    
+            choice[pack_nr] = 1
             packs_left_index.remove(pack_nr)
-        
-        chosen_packs = [pack for pack in packs if choice[pack[0]] == 1]
 
-        perm = [pack[0] for pack in chosen_packs]
+        chosen_packs = [pack for pack in packs if choice[pack.index] == 1]
+
+        perm = [pack.index for pack in chosen_packs]
         random.shuffle(perm)
 
-        # Checking if the solution is acceptable    
-        dist = sum( [ distance(packs[perm[i]][3], packs[perm[i+1]][3]) for i in range(len(perm)-1) ] ) + distance(start_address, packs[perm[0]][3])
+        # Checking if the solution is acceptable
+        dist = sum(
+            [
+                packs[perm[i]].position.distance_to(packs[perm[i + 1]].position)
+                for i in range(len(perm) - 1)
+            ]
+        ) + start_address.distance_to(packs[perm[0]].position)
         count = choice.count(1)
-        volume = sum( packs[perm[i]][2] for i in range(len(perm)) )
-        weight = sum( packs[perm[i]][1] for i in range(len(perm)) )
+        volume = sum(packs[perm[i]].volume for i in range(len(perm)))
+        weight = sum(packs[perm[i]].weight for i in range(len(perm)))
 
         # Adding solution to the retured list if it is acceptable
         if dist <= D and count >= h and volume <= V and weight <= M:
-            solutions.append( PermSolution(choice, perm) )
+            solutions.append(PermSolution(choice, perm))
             sol_generated_count += 1
-        
-        generation_attempts_count += 1
 
-    # print(f"{generation_attempts_count=}")
+        generation_attempts_count += 1
+    print("\nDone.")
     return solutions
 
-def solutions_to_matrices(solutions, packsCount):
-    """ Convert list of PermSolutions to a list of MatSolutions """
+
+def solutions_to_matrices(
+    solutions: list[PermSolution], packs_count: int
+) -> list[MatSolution]:
+    """Convert list of PermSolutions to a list of MatSolutions"""
     matrices = []
     for solution in solutions:
-        matrix = [ bitarray(packsCount) for _ in range(packsCount)]
+        matrix = [bitarray(packs_count) for _ in range(packs_count)]
         for row in matrix:
             row.setall(0)
         for index, pack_nr in enumerate(solution.perm):
             matrix[pack_nr][index] = 1
         matrices.append(MatSolution(matrix))
     return matrices
-    
 
 
-
-if __name__  == "__main__":
-
+if __name__ == "__main__":
     # EXAMPLE OF PROBLEM DEFINITION
-    start_address = (0, 0)  # Starting point for the Courier
-    max_x, max_y = 30, 30     # Map Dimentions
+    start_address = Point(0, 0)  # Starting point for the Courier
+    max_x, max_y = 30, 30  # Map Dimentions
 
-    V = 100   # Max Volume
-    M = 120   # Max Weight
+    V = 100  # Max Volume
+    M = 120  # Max Weight
     D = 180  # Max Distance
-    h = 8    # Min Number Of Chosen Packs
+    h = 8  # Min Number Of Chosen Packs
 
     packs = [
         (0, 2, 1, (5, 25), 0),
@@ -156,15 +129,16 @@ if __name__  == "__main__":
         (28, 2, 5, (15, 17), 0),
         (29, 5, 1, (16, 9), 0),
     ]
+    packs = convert_to_package_list(packs)
 
     # Prints package addresses map
-    map = [['-' for _ in range(max_y)] for _ in range(max_x)]
-    map[start_address[0]][start_address[1]] = 'X'
+    map = [["-" for _ in range(max_y)] for _ in range(max_x)]
+    map[start_address.x][start_address.y] = "X"
     for pack in packs:
-        map[pack[3][0]][pack[3][1]] = pack[0]
+        map[pack.position.x][pack.position.y] = pack.index
     for row in map:
         for el in row:
-            print(el, end=' ')
+            print(el, end=" ")
         print()
 
     # Generates and prints first batch of solutions

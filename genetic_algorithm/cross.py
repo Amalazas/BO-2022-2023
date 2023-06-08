@@ -1,30 +1,26 @@
 from copy import copy
-from random import uniform
 
 from bitarray import bitarray
-from generator import PermSolution, distance, generate_initial_solutions
+from generator import generate_initial_solutions
+from data_classes import PermSolution, Point, Package
 
 
 def halve_and_swap(
-    parent1: PermSolution,
-    parent2: PermSolution,
-    packs=None,
-    V=None,
-    M=None,
-    D=None,
-    h=None,
-    start_address=None,
+    parent1: PermSolution, parent2: PermSolution, *args, **kwargs
 ) -> PermSolution:
-    """Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców.
-    Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!"""
+    """
+    Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców.
+    Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!
+    """
 
-    ## Childs' packages choice array
+    # Child's choice array
     half1 = parent1.choice[: len(parent1.choice) // 2]
     half2 = parent2.choice[len(parent2.choice) // 2 :]
     new_choice = half1 + half2
 
-    ## Child's permutation
+    # Child's permutation
     new_perm = []
+
     # Going through the first half of the choice and getting subseries from parent1 permutation
     unused_packs_indexes = [i for i in range(len(half1)) if half1[i] == 1]
 
@@ -73,12 +69,12 @@ def halve_and_swap(
 def extract_and_random_pick(
     parent1: PermSolution,
     parent2: PermSolution,
-    packs=None,
-    V=None,
-    M=None,
-    D=None,
-    h=None,
-    start_address=None,
+    packs: list[Package] = None,
+    V: float = None,
+    M: float = None,
+    D: float = None,
+    h: int = None,
+    start_address: Point = None,
 ) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     new_perm = [
@@ -90,21 +86,23 @@ def extract_and_random_pick(
 
     v = m = d = 0
     for pckg_idx in new_perm:
-        m += packs[pckg_idx][1]
-        v += packs[pckg_idx][2]
+        m += packs[pckg_idx].weight
+        v += packs[pckg_idx].volume
 
     for i in range(len(new_perm)):
         if i - 1 < 0:
-            d += distance(start_address, packs[new_perm[i]][3])
+            d += start_address.distance_to(packs[new_perm[i]].position)
         else:
-            d += distance(packs[new_perm[i - 1]][3], packs[new_perm[i]][3])
+            d += packs[new_perm[i - 1]].position.distance_to(
+                packs[new_perm[i]].position
+            )
 
     for pckg_idx in left_packages:
-        _, pckg_m, pckg_v, (x, y), _ = packs[pckg_idx]
+        _, pckg_m, pckg_v, pos, _ = packs[pckg_idx]
 
-        last_point = packs[new_perm[-1]][3] if new_perm else start_address
+        last_point = packs[new_perm[-1]].position if new_perm else start_address
 
-        new_dist = d + distance(last_point, (x, y)) + distance((x, y), start_address)
+        new_dist = d + last_point.distance_to(pos) + pos.distance_to(start_address)
         if v + pckg_v <= V and m + pckg_m <= M and new_dist <= D:
             new_perm.append(pckg_idx)
             v += pckg_v
@@ -120,18 +118,13 @@ def extract_and_random_pick(
 
 
 def choice_from_one_order_from_other(
-    parent1: PermSolution,
-    parent2: PermSolution,
-    packs=None,
-    V=None,
-    M=None,
-    D=None,
-    h=None,
-    start_address=None,
+    parent1: PermSolution, parent2: PermSolution, *args, **kwargs
 ) -> PermSolution:
-    """Copy choice of the first parent and base the order by the order of second parent.
+    """
+    Copy choice of the first parent and base the order by the order of second parent.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!
-    Also, kinda weird way to cross :D"""
+    Also, kinda weird way to cross :D
+    """
 
     new_choice = parent1.choice
     new_perm = []
@@ -151,10 +144,17 @@ def choice_from_one_order_from_other(
     return PermSolution(new_choice, new_perm)
 
 
-if __name__ == "__main__":
+CROSS_DICT = {
+    "choice_from_one_order_from_other": choice_from_one_order_from_other,
+    "extract_and_random_pick": extract_and_random_pick,
+    "halve_and_swap": halve_and_swap,
+    "random": None,
+}
 
+
+if __name__ == "__main__":
     # EXAMPLE OF PROBLEM DEFINITION
-    start_address = (0, 0)  # Starting point for the Courier
+    start_address = Point(0, 0)  # Starting point for the Courier
     max_x, max_y = 13, 20  # Map Dimentions
 
     V = 30  # Max Volume
@@ -163,16 +163,16 @@ if __name__ == "__main__":
     h = 5  # Min Number Of Chosen Packs
 
     packs = [
-        (0, 2, 2, (3, 2), 0),
-        (1, 2, 2, (1, 1), 0),
-        (2, 10, 5, (10, 19), 1),
-        (3, 4, 3, (10, 12), 0),
-        (4, 2, 2, (3, 4), 1),
-        (5, 1, 2, (1, 10), 0),
-        (6, 12, 2, (4, 1), 0),
-        (7, 2, 2, (12, 1), 1),
-        (8, 5, 2, (9, 2), 0),
-        (9, 3, 2, (5, 5), 0),
+        Package(0, 2, 2, Point(3, 2), 0),
+        Package(1, 2, 2, Point(1, 1), 0),
+        Package(2, 10, 5, Point(10, 19), 1),
+        Package(3, 4, 3, Point(10, 12), 0),
+        Package(4, 2, 2, Point(3, 4), 1),
+        Package(5, 1, 2, Point(1, 10), 0),
+        Package(6, 12, 2, Point(4, 1), 0),
+        Package(7, 2, 2, Point(12, 1), 1),
+        Package(8, 5, 2, Point(9, 2), 0),
+        Package(9, 3, 2, Point(5, 5), 0),
     ]
 
     # Generating and choosing solutions to cross
