@@ -77,8 +77,7 @@ def shuffle_block(individual: PermSolution) -> None:
 
 
 def inverse_packages(individual: PermSolution) -> None:
-    """Inverses random pair of (taken, nontaken) packages
-    TODO: Implement in such a way that it is guaranteed not to produce invalid solutions???"""
+    """Inverses random pair of (taken, nontaken) packages"""
 
     packages = individual.choice
     taken_packages = [i for i in range(len(packages)) if packages[i] == 1]

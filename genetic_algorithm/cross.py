@@ -5,15 +5,17 @@ from generator import generate_initial_solutions
 from data_classes import PermSolution, Point, Package
 
 
-def halve_and_swap(parent1: PermSolution, parent2: PermSolution, *args, **kwargs) -> PermSolution:
+def halve_and_swap(
+    parent1: PermSolution, parent2: PermSolution, *args, **kwargs
+) -> PermSolution:
     """
     Dzielisz bitmapę na pół, wymieniasz je i uzupełniasz permutację kopiując fragmenty permutacji rodziców.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!
     """
 
     # Child's choice array
-    half1 = parent1.choice[:len(parent1.choice) // 2]
-    half2 = parent2.choice[len(parent2.choice) // 2:]
+    half1 = parent1.choice[: len(parent1.choice) // 2]
+    half2 = parent2.choice[len(parent2.choice) // 2 :]
     new_choice = half1 + half2
 
     # Child's permutation
@@ -64,7 +66,16 @@ def halve_and_swap(parent1: PermSolution, parent2: PermSolution, *args, **kwargs
     return PermSolution(new_choice, new_perm)
 
 
-def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution, packs: list[Package] = None, V: float = None, M: float = None, D: float = None, h: int = None, start_address: Point = None) -> PermSolution:
+def extract_and_random_pick(
+    parent1: PermSolution,
+    parent2: PermSolution,
+    packs: list[Package] = None,
+    V: float = None,
+    M: float = None,
+    D: float = None,
+    h: int = None,
+    start_address: Point = None,
+) -> PermSolution:
     common_packages_bitmap = parent1.choice & parent2.choice
     new_perm = [
         package for package in parent2.perm if common_packages_bitmap[package] == 1
@@ -82,7 +93,9 @@ def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution, packs:
         if i - 1 < 0:
             d += start_address.distance_to(packs[new_perm[i]].position)
         else:
-            d += packs[new_perm[i - 1]].position.distance_to(packs[new_perm[i]].position)
+            d += packs[new_perm[i - 1]].position.distance_to(
+                packs[new_perm[i]].position
+            )
 
     for pckg_idx in left_packages:
         _, pckg_m, pckg_v, pos, _ = packs[pckg_idx]
@@ -104,7 +117,9 @@ def extract_and_random_pick(parent1: PermSolution, parent2: PermSolution, packs:
     return PermSolution(new_choice, new_perm)
 
 
-def choice_from_one_order_from_other(parent1: PermSolution, parent2: PermSolution, *args, **kwargs) -> PermSolution:
+def choice_from_one_order_from_other(
+    parent1: PermSolution, parent2: PermSolution, *args, **kwargs
+) -> PermSolution:
     """
     Copy choice of the first parent and base the order by the order of second parent.
     Nie ma pewności, że potomek jest rozwiązaniem akceptowalnym!!!

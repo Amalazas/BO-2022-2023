@@ -20,6 +20,7 @@ from mutation import (
 from simulation import GeneticAlgorithm
 from data_classes import Package, Point
 
+
 class GUI:
     """GUI for selecting parameters and showing results."""
 
@@ -272,7 +273,12 @@ class GUI:
             self.start_address_x_var.set(x)
             self.start_address_y_var.set(y)
             volume, weight, distance, min_chosen_packs = f.readline().split()
-            volume, weight, distance, min_chosen_packs = float(volume), float(weight), float(distance), int(min_chosen_packs)
+            volume, weight, distance, min_chosen_packs = (
+                float(volume),
+                float(weight),
+                float(distance),
+                int(min_chosen_packs),
+            )
             self.max_volume_var.set(volume)
             self.max_weight_var.set(weight)
             self.max_distance_var.set(distance)

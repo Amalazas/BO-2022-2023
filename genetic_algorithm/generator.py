@@ -1,20 +1,39 @@
 import random
 
 from bitarray import bitarray
-from data_classes import PermSolution, MatSolution, Point, Package, convert_to_package_list
+from data_classes import (
+    PermSolution,
+    MatSolution,
+    Point,
+    Package,
+    convert_to_package_list,
+)
 
 
-def generate_initial_solutions(V: float, M: float, D: float, h: int, start_address: Point, packs: list[Package], amount: int = 50,) -> list[PermSolution]:
+def generate_initial_solutions(
+    V: float,
+    M: float,
+    D: float,
+    h: int,
+    start_address: Point,
+    packs: list[Package],
+    amount: int = 50,
+) -> list[PermSolution]:
     solutions = []
     sol_generated_count = 0
     generation_attempts_count = 0
 
     while sol_generated_count <= amount:
-        print(f"Generated {sol_generated_count} out of {amount} initial solutions...", end="\r")
+        print(
+            f"Generated {sol_generated_count} out of {amount} initial solutions...",
+            end="\r",
+        )
 
         choice = bitarray(len(packs))
         choice.setall(0)
-        for i, pack in enumerate(packs):  # Making sure that the packs with priority flag are selected
+        for i, pack in enumerate(
+            packs
+        ):  # Making sure that the packs with priority flag are selected
             if pack.priority == 1:
                 choice[i] = 1
         packs_left_index = [i for i in range(len(packs)) if packs[i].priority == 0]
@@ -54,7 +73,8 @@ def generate_initial_solutions(V: float, M: float, D: float, h: int, start_addre
 
 
 def solutions_to_matrices(
-    solutions: list[PermSolution], packs_count: int) -> list[MatSolution]:
+    solutions: list[PermSolution], packs_count: int
+) -> list[MatSolution]:
     """Convert list of PermSolutions to a list of MatSolutions"""
     matrices = []
     for solution in solutions:

@@ -9,7 +9,7 @@ class Point:
 
     def __str__(self) -> str:
         return f"({self.x}, {self.y})"
-    
+
     def __iter__(self):
         return iter((self.x, self.y))
 
@@ -20,21 +20,25 @@ class Point:
             return self.y
         else:
             raise IndexError("Index out of range")
-    
+
     def distance_to(self, other_point: "Point") -> float:
         return math.sqrt((self.x - other_point.x) ** 2 + (self.y - other_point.y) ** 2)
 
 
 class Package:
-    def __init__(self, index: int, weight: float, volume: float, position: Point, priority: int) -> None:
+    def __init__(
+        self, index: int, weight: float, volume: float, position: Point, priority: int
+    ) -> None:
         self.index = int(index)
         self.weight = float(weight)
         self.volume = float(volume)
         self.position = Point(*position)
         self.priority = int(priority)
-    
+
     def __iter__(self):
-        return iter((self.index, self.weight, self.volume, self.position, self.priority))
+        return iter(
+            (self.index, self.weight, self.volume, self.position, self.priority)
+        )
 
     def __str__(self) -> str:
         return f"Package {self.index} with weight {self.weight} and volume {self.volume} at {self.position} with priority {self.priority}"
@@ -52,12 +56,14 @@ class Package:
             return self.priority
         else:
             raise IndexError("Index out of range")
-    
+
     def distance_to(self, other_package: "Package") -> float:
         return self.position.distance_to(other_package.position)
 
 
-def convert_to_package_list(packages: list[tuple[int, float, float, tuple[float, float], int]]) -> list[Package]:
+def convert_to_package_list(
+    packages: list[tuple[int, float, float, tuple[float, float], int]]
+) -> list[Package]:
     return [Package(*package) for package in packages]
 
 
@@ -67,7 +73,7 @@ class PermSolution:
         self.perm = perm
         self.age = 0
         self.was_aged = False
-    
+
     def __str__(self) -> str:
         return f"{self.choice}, {self.perm}, {self.age}"
 

@@ -5,11 +5,30 @@ from itertools import permutations
 import matplotlib.pyplot as plt
 import networkx as nx
 from bitarray import bitarray
-from cross import choice_from_one_order_from_other, extract_and_random_pick, halve_and_swap, CROSS_DICT
+from cross import (
+    choice_from_one_order_from_other,
+    extract_and_random_pick,
+    halve_and_swap,
+    CROSS_DICT,
+)
 from generator import generate_initial_solutions
 from matplotlib.figure import Figure
-from mutation import add_packs, cut_out_packs, inverse_packages, inverse_permutation, shift_block, shuffle_block, MUTATION_DICT
-from data_classes import PermSolution, MatSolution, Point, Package, convert_to_package_list
+from mutation import (
+    add_packs,
+    cut_out_packs,
+    inverse_packages,
+    inverse_permutation,
+    shift_block,
+    shuffle_block,
+    MUTATION_DICT,
+)
+from data_classes import (
+    PermSolution,
+    MatSolution,
+    Point,
+    Package,
+    convert_to_package_list,
+)
 
 
 class GeneticAlgorithm:
@@ -35,10 +54,28 @@ class GeneticAlgorithm:
         log_every: number of generations after which informations are printed
     """
 
-    def __init__(self, max_volume, max_weight, max_distance, min_chosen_packs, start_address, packs, population_size=100, max_generations=1000,
-        max_iter_no_improvement=30, alpha=1.15, crossover_rate=0.1, mutation_rate=0.005, crossover_function=None, mutation_function=None,
-        elitism_rate=0.1, crossover_max_attempts=1000, mutation_max_attempts=1000, log_every=1, output_file=None):
-
+    def __init__(
+        self,
+        max_volume,
+        max_weight,
+        max_distance,
+        min_chosen_packs,
+        start_address,
+        packs,
+        population_size=100,
+        max_generations=1000,
+        max_iter_no_improvement=30,
+        alpha=1.15,
+        crossover_rate=0.1,
+        mutation_rate=0.005,
+        crossover_function=None,
+        mutation_function=None,
+        elitism_rate=0.1,
+        crossover_max_attempts=1000,
+        mutation_max_attempts=1000,
+        log_every=1,
+        output_file=None,
+    ):
         self.population = []
         self.max_volume = max_volume
         self.max_weight = max_weight
@@ -68,10 +105,33 @@ class GeneticAlgorithm:
         self.packages_positions = [tuple(pckg[3]) for pckg in self.packs]
         self.G.add_node(self.start_address)
         self.G.add_nodes_from(self.packages_positions)
-        self.pos = dict(zip(self.G.nodes, [tuple(start_address)] + self.packages_positions))
+        self.pos = dict(
+            zip(self.G.nodes, [tuple(start_address)] + self.packages_positions)
+        )
 
-        self.mutation_type_count = dict(zip(["add_packs", "cut_out_packs", "inverse_packages", "inverse_permutation", "shift_block", "shuffle_block"], [0 for _ in range(6)]))
-        self.cross_type_count = dict(zip(["choice_from_one_order_from_other", "extract_and_random_pick", "halve_and_swap"], [0 for _ in range(3)]))
+        self.mutation_type_count = dict(
+            zip(
+                [
+                    "add_packs",
+                    "cut_out_packs",
+                    "inverse_packages",
+                    "inverse_permutation",
+                    "shift_block",
+                    "shuffle_block",
+                ],
+                [0 for _ in range(6)],
+            )
+        )
+        self.cross_type_count = dict(
+            zip(
+                [
+                    "choice_from_one_order_from_other",
+                    "extract_and_random_pick",
+                    "halve_and_swap",
+                ],
+                [0 for _ in range(3)],
+            )
+        )
         self.output_f = output_file
 
     def run(self):
@@ -79,8 +139,9 @@ class GeneticAlgorithm:
         self._initialize_population()
 
         if self.output_f is not None:
-            self.output_f.write(f"generation, best_score, generation_best_score, avg_population_age, new_solutions_count\n")
-
+            self.output_f.write(
+                f"generation, best_score, generation_best_score, avg_population_age, new_solutions_count\n"
+            )
 
         no_improvement_iter = 0
         for i in range(self.max_generations):
@@ -90,18 +151,20 @@ class GeneticAlgorithm:
                 print(
                     f"Generation {i: <{len(str(self.max_generations))}} | Best score: {self.best_score: < 16.10} | Current generation best score: {self._fitness(self.population[0]): < 16.10} | Avg population age: {average_population_age: < 16.10} | New solutions count: {new_solutions_count}"
                 )
-                if self.output_f is not None: 
-                    self.output_f.write(f"{i: <{len(str(self.max_generations))}}, {self.best_score: < 16.10}, {self._fitness(self.population[0]): < 16.10}, {average_population_age: < 16.10}, {new_solutions_count}\n")
+                if self.output_f is not None:
+                    self.output_f.write(
+                        f"{i: <{len(str(self.max_generations))}}, {self.best_score: < 16.10}, {self._fitness(self.population[0]): < 16.10}, {average_population_age: < 16.10}, {new_solutions_count}\n"
+                    )
             # for individual in self.population:
             #     print(f"{individual.perm} | {self._fitness(individual)}")
 
             prev_best_score = self.best_score
-            
+
             # Aging population - it seems that the solutions are stored by reference and there are multiple
             # references to the same solutions, that's why i use the was_aged flag
             for solution in self.population:
                 if not solution.was_aged:
-                    solution.age += 1 
+                    solution.age += 1
                     solution.was_aged = True
             for solution in self.population:
                 solution.was_aged = False
@@ -132,13 +195,13 @@ class GeneticAlgorithm:
             print(f"{key}: {value}")
 
         # # Saving the stats into the output file
-        # if self.output_f is not None: 
+        # if self.output_f is not None:
         #     self.output_f.write(f"Mutations:\n")
         #     for key, value in self.mutation_type_count.items():
         #         self.output_f.write(f"{key}: {value}\n")
         #     self.output_f.write(f"Crossovers:\n")
         #     for key, value in self.cross_type_count.items():
-        #         self.output_f.write(f"{key}: {value}\n") 
+        #         self.output_f.write(f"{key}: {value}\n")
 
     def _initialize_population(self) -> None:
         """Generates initial population of size 'population_size.'"""
@@ -177,7 +240,9 @@ class GeneticAlgorithm:
             return False
         if (
             sum(
-                self.packs[individual.perm[i]][3].distance_to(self.packs[individual.perm[i + 1]][3])
+                self.packs[individual.perm[i]][3].distance_to(
+                    self.packs[individual.perm[i + 1]][3]
+                )
                 for i in range(len(individual.perm) - 1)
             )
             + self.start_address.distance_to(self.packs[individual.perm[0]][3])
@@ -191,10 +256,14 @@ class GeneticAlgorithm:
         score = float("inf")
         if len(individual.perm) != 0:
             total_weight = sum(self.packs[i][1] for i in individual.perm)
-            score = total_weight * self.start_address.distance_to(self.packs[individual.perm[0]][3])
+            score = total_weight * self.start_address.distance_to(
+                self.packs[individual.perm[0]][3]
+            )
             total_weight -= self.packs[individual.perm[0]][1]
             for i in range(1, len(individual.perm)):
-                score += total_weight * self.packs[individual.perm[i - 1]][3].distance_to(self.packs[individual.perm[i]][3])
+                score += total_weight * self.packs[individual.perm[i - 1]][
+                    3
+                ].distance_to(self.packs[individual.perm[i]][3])
                 total_weight -= self.packs[individual.perm[i]][1]
 
             k, n = len(individual.perm), len(self.packs)
@@ -227,7 +296,10 @@ class GeneticAlgorithm:
         for i in range(0, len(parents) - 1, 2):
             if random.random() > self.crossover_rate:
                 continue
-            if type(self.crossover_function) == list or type(self.crossover_function) == tuple:
+            if (
+                type(self.crossover_function) == list
+                or type(self.crossover_function) == tuple
+            ):
                 cross_func = random.choice(self.crossover_function)
             else:
                 cross_func = (
@@ -257,7 +329,9 @@ class GeneticAlgorithm:
                         self.start_address,
                     )
                     if self._verify(child):
-                        self.cross_type_count[cross_func.__name__] = self.cross_type_count[cross_func.__name__] + 1 
+                        self.cross_type_count[cross_func.__name__] = (
+                            self.cross_type_count[cross_func.__name__] + 1
+                        )
                         children.append(child)
                         break
                 else:
@@ -270,7 +344,10 @@ class GeneticAlgorithm:
         """Performs mutation on selected children. If mutation fails more than mutation_max_attempts then the child is not mutated."""
         for i in range(len(children)):
             if random.random() < self.mutation_rate:
-                if type(self.mutation_function) == list or type(self.mutation_function) == tuple:
+                if (
+                    type(self.mutation_function) == list
+                    or type(self.mutation_function) == tuple
+                ):
                     mutate_func = random.choice(self.mutation_function)
                 else:
                     mutate_func = (
@@ -293,7 +370,9 @@ class GeneticAlgorithm:
                     )
                     mutate_func(child_copy)
                     if self._verify(child_copy):
-                        self.mutation_type_count[mutate_func.__name__] = self.mutation_type_count[mutate_func.__name__] + 1
+                        self.mutation_type_count[mutate_func.__name__] = (
+                            self.mutation_type_count[mutate_func.__name__] + 1
+                        )
                         children[i] = child_copy
                         break
                 else:
@@ -302,7 +381,9 @@ class GeneticAlgorithm:
 
     def _replace(self, parents, children):
         """Replaces the population with the new population consisting of top parents and children."""
-        self.population = sorted(parents + children, key=self._fitness)[:len(self.population)]
+        self.population = sorted(parents + children, key=self._fitness)[
+            : len(self.population)
+        ]
         if self._fitness(self.population[0]) < self.best_score:
             self.best_score = self._fitness(self.population[0])
             self.best_individual = self.population[0]
@@ -312,8 +393,8 @@ class GeneticAlgorithm:
         sum_of_ages = 0
         for solution in self.population:
             sum_of_ages += solution.age
-        return (sum_of_ages / len(self.population))
-    
+        return sum_of_ages / len(self.population)
+
     def new_solutions_count(self) -> int:
         count = 0
         for solution in self.population:
@@ -418,7 +499,9 @@ class GeneticAlgorithm:
             total_volume = sum(self.packs[i][2] for i in solution.perm)
             total_distance = 0
             for i in range(1, len(solution.perm)):
-                total_distance += self.packs[solution.perm[i - 1]][3].distance_to(self.packs[solution.perm[i]][3]) 
+                total_distance += self.packs[solution.perm[i - 1]][3].distance_to(
+                    self.packs[solution.perm[i]][3]
+                )
             pack_count = len(solution.perm)
         return f"{total_weight=} {total_volume=} {total_distance=} {pack_count=}"
 
@@ -463,7 +546,7 @@ if __name__ == "__main__":
         (29, 5, 1, (16, 9), 0),
     ]
     packs = convert_to_package_list(packs)
-    
+
     ga = GeneticAlgorithm(
         max_volume,
         max_weight,

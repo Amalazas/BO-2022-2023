@@ -7,7 +7,7 @@ import os
 
 
 if __name__ == "__main__":
-    """ 
+    """
     Program arguments:
 
         problem_file_path,
@@ -22,45 +22,63 @@ if __name__ == "__main__":
         elitism_rate,
         crossover_max_attempts,
         mutation_max_attempts
-        
+
         Example Run: py tester.py test_input_7.txt 3000 1000 60 7.95 0.7 0.05 random add_packs 0.4 20 20
 
-        """
-    
+    """
+
     if len(sys.argv) != 13:
-        print("Please, provide all necessary arguments for this program - check source code for details")
+        print(
+            "Please, provide all necessary arguments for this program - check source code for details"
+        )
         exit()
 
     # Reading and checking if the problem file is ok
     input = read_input_file("./input/" + sys.argv[1])
     if input is None:
         exit()
-    
+
     # Creating the output file with descriptive name
-    output_file_name = "test_output " \
-                    + sys.argv[1]  + " " \
-                    + sys.argv[2]  + " " \
-                    + sys.argv[3]  + " " \
-                    + sys.argv[4]  + " " \
-                    + sys.argv[5]  + " " \
-                    + sys.argv[6]  + " " \
-                    + sys.argv[7]  + " " \
-                    + sys.argv[8]  + " " \
-                    + sys.argv[9]  + " " \
-                    + sys.argv[10] + " " \
-                    + sys.argv[11] + " " \
-                    + sys.argv[12] + " " \
-                    + ".csv"
+    output_file_name = (
+        "test_output "
+        + sys.argv[1]
+        + " "
+        + sys.argv[2]
+        + " "
+        + sys.argv[3]
+        + " "
+        + sys.argv[4]
+        + " "
+        + sys.argv[5]
+        + " "
+        + sys.argv[6]
+        + " "
+        + sys.argv[7]
+        + " "
+        + sys.argv[8]
+        + " "
+        + sys.argv[9]
+        + " "
+        + sys.argv[10]
+        + " "
+        + sys.argv[11]
+        + " "
+        + sys.argv[12]
+        + " "
+        + ".csv"
+    )
     if not os.path.exists("./output"):
         os.makedirs("./output")
-    
-    with open("output/" + output_file_name, 'wt') as f:
 
+    with open("output/" + output_file_name, "wt") as f:
         # Starting the simulation
         start_address, V, M, D, h, packs = input
         print(packs[0])
         ga = GeneticAlgorithm(
-            V, M, D, h,
+            V,
+            M,
+            D,
+            h,
             start_address,
             packs,
             population_size=int(sys.argv[2]),
@@ -69,12 +87,12 @@ if __name__ == "__main__":
             alpha=float(sys.argv[5]),
             crossover_rate=float(sys.argv[6]),
             mutation_rate=float(sys.argv[7]),
-            crossover_function= CROSS_DICT[sys.argv[8]],
-            mutation_function= MUTATION_DICT[sys.argv[9]],
+            crossover_function=CROSS_DICT[sys.argv[8]],
+            mutation_function=MUTATION_DICT[sys.argv[9]],
             elitism_rate=float(sys.argv[10]),
             crossover_max_attempts=int(sys.argv[11]),
             mutation_max_attempts=int(sys.argv[12]),
-            output_file = f
+            output_file=f,
         )
 
         ga.run()
