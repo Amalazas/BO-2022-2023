@@ -177,12 +177,11 @@ def cli(**kwargs):
     else:
         ga.run()
         print(f"Stats: {ga.solution_stats(ga.best_individual)}")
-    print(ga.best_individual)
-    fig1 = ga.display_solution(ga.best_individual.perm, display=False)
-    fig2 = ga.display(display=False)
-    plt.show()
-
-
+        print(ga.best_individual)
+        fig1 = ga.display_solution(ga.best_individual.perm, display=False)
+        fig2 = ga.display(display=False)
+        plt.show()
+        
 
 if __name__ == "__main__":
     run()
