@@ -5,21 +5,11 @@ from itertools import permutations
 import matplotlib.pyplot as plt
 import networkx as nx
 from bitarray import bitarray
-from cross import (
-    choice_from_one_order_from_other,
-    extract_and_random_pick,
-    halve_and_swap,
-)
-from generator import PermSolution, distance, generate_initial_solutions
+from cross import choice_from_one_order_from_other, extract_and_random_pick, halve_and_swap, CROSS_DICT
+from generator import generate_initial_solutions
 from matplotlib.figure import Figure
-from mutation import (
-    add_packs,
-    cut_out_packs,
-    inverse_packages,
-    inverse_permutation,
-    shift_block,
-    shuffle_block,
-)
+from mutation import add_packs, cut_out_packs, inverse_packages, inverse_permutation, shift_block, shuffle_block, MUTATION_DICT
+from data_classes import PermSolution, MatSolution, Point, Package, convert_to_package_list
 
 
 class GeneticAlgorithm:
@@ -45,28 +35,10 @@ class GeneticAlgorithm:
         log_every: number of generations after which informations are printed
     """
 
-    def __init__(
-        self,
-        max_volume,
-        max_weight,
-        max_distance,
-        min_chosen_packs,
-        start_address,
-        packs,
-        population_size=100,
-        max_generations=1000,
-        max_iter_no_improvement=30,
-        alpha=1.15,
-        crossover_rate=0.1,
-        mutation_rate=0.005,
-        crossover_function=None,
-        mutation_function=None,
-        elitism_rate=0.1,
-        crossover_max_attempts=1000,
-        mutation_max_attempts=1000,
-        log_every=1,
-        output_file=None
-    ):
+    def __init__(self, max_volume, max_weight, max_distance, min_chosen_packs, start_address, packs, population_size=100, max_generations=1000,
+        max_iter_no_improvement=30, alpha=1.15, crossover_rate=0.1, mutation_rate=0.005, crossover_function=None, mutation_function=None,
+        elitism_rate=0.1, crossover_max_attempts=1000, mutation_max_attempts=1000, log_every=1, output_file=None):
+
         self.population = []
         self.max_volume = max_volume
         self.max_weight = max_weight
@@ -75,9 +47,7 @@ class GeneticAlgorithm:
         self.start_address = start_address
         self.packs = packs
         # for simplicity population_size is even
-        self.population_size = (
-            population_size if population_size % 2 == 0 else population_size + 1
-        )
+        self.population_size = population_size + population_size % 2
         self.max_generations = max_generations
         self.max_iter_no_improvement = max_iter_no_improvement
         self.alpha = alpha
@@ -95,26 +65,13 @@ class GeneticAlgorithm:
         self.priority_packs_indexes = (pack[0] for pack in packs if pack[4] != 0)
 
         self.G = nx.DiGraph()
-        self.packages_positions = [pckg[3] for pckg in self.packs]
+        self.packages_positions = [tuple(pckg[3]) for pckg in self.packs]
         self.G.add_node(self.start_address)
         self.G.add_nodes_from(self.packages_positions)
-        self.pos = dict(zip(self.G.nodes, [start_address] + self.packages_positions))
+        self.pos = dict(zip(self.G.nodes, [tuple(start_address)] + self.packages_positions))
 
-        self.mutation_type_count = dict(zip(["add_packs",
-                                            "cut_out_packs",
-                                            "inverse_packages",
-                                            "inverse_permutation",
-                                            "shift_block",
-                                            "shuffle_block"],
-                                            [0 for _ in range(6)]
-                                            ))
-        
-        self.cross_type_count = dict(zip(["choice_from_one_order_from_other",
-                                          "extract_and_random_pick",
-                                          "halve_and_swap"],
-                                            [0 for _ in range(3)]
-                                            ))
-        
+        self.mutation_type_count = dict(zip(["add_packs", "cut_out_packs", "inverse_packages", "inverse_permutation", "shift_block", "shuffle_block"], [0 for _ in range(6)]))
+        self.cross_type_count = dict(zip(["choice_from_one_order_from_other", "extract_and_random_pick", "halve_and_swap"], [0 for _ in range(3)]))
         self.output_f = output_file
 
     def run(self):
@@ -220,13 +177,10 @@ class GeneticAlgorithm:
             return False
         if (
             sum(
-                distance(
-                    self.packs[individual.perm[i]][3],
-                    self.packs[individual.perm[i + 1]][3],
-                )
+                self.packs[individual.perm[i]][3].distance_to(self.packs[individual.perm[i + 1]][3])
                 for i in range(len(individual.perm) - 1)
             )
-            + distance(self.start_address, self.packs[individual.perm[0]][3])
+            + self.start_address.distance_to(self.packs[individual.perm[0]][3])
             > self.max_distance
         ):
             return False
@@ -237,15 +191,10 @@ class GeneticAlgorithm:
         score = float("inf")
         if len(individual.perm) != 0:
             total_weight = sum(self.packs[i][1] for i in individual.perm)
-            score = total_weight * distance(
-                self.start_address, self.packs[individual.perm[0]][3]
-            )
+            score = total_weight * self.start_address.distance_to(self.packs[individual.perm[0]][3])
             total_weight -= self.packs[individual.perm[0]][1]
             for i in range(1, len(individual.perm)):
-                score += total_weight * distance(
-                    self.packs[individual.perm[i - 1]][3],
-                    self.packs[individual.perm[i]][3],
-                )
+                score += total_weight * self.packs[individual.perm[i - 1]][3].distance_to(self.packs[individual.perm[i]][3])
                 total_weight -= self.packs[individual.perm[i]][1]
 
             k, n = len(individual.perm), len(self.packs)
@@ -278,18 +227,20 @@ class GeneticAlgorithm:
         for i in range(0, len(parents) - 1, 2):
             if random.random() > self.crossover_rate:
                 continue
-
-            cross_func = (
-                self.crossover_function
-                if self.crossover_function is not None
-                else random.choice(
-                    [
-                        halve_and_swap,
-                        extract_and_random_pick,
-                        choice_from_one_order_from_other,
-                    ]
+            if type(self.crossover_function) == list or type(self.crossover_function) == tuple:
+                cross_func = random.choice(self.crossover_function)
+            else:
+                cross_func = (
+                    self.crossover_function
+                    if self.crossover_function is not None
+                    else random.choice(
+                        [
+                            halve_and_swap,
+                            extract_and_random_pick,
+                            choice_from_one_order_from_other,
+                        ]
+                    )
                 )
-            )
             for parent_a, parent_b in [
                 (parents[i], parents[i + 1]),
                 (parents[i + 1], parents[i]),
@@ -319,20 +270,23 @@ class GeneticAlgorithm:
         """Performs mutation on selected children. If mutation fails more than mutation_max_attempts then the child is not mutated."""
         for i in range(len(children)):
             if random.random() < self.mutation_rate:
-                mutate_func = (
-                    self.mutation_function
-                    if self.mutation_function is not None
-                    else random.choice(
-                        [
-                            inverse_permutation,
-                            shift_block,
-                            shuffle_block,
-                            inverse_packages,
-                            cut_out_packs,
-                            add_packs,
-                        ]
+                if type(self.mutation_function) == list or type(self.mutation_function) == tuple:
+                    mutate_func = random.choice(self.mutation_function)
+                else:
+                    mutate_func = (
+                        self.mutation_function
+                        if self.mutation_function is not None
+                        else random.choice(
+                            [
+                                inverse_permutation,
+                                shift_block,
+                                shuffle_block,
+                                inverse_packages,
+                                cut_out_packs,
+                                add_packs,
+                            ]
+                        )
                     )
-                )
                 for _ in range(self.mutation_max_attempts):
                     child_copy = PermSolution(
                         children[i].choice.copy(), children[i].perm.copy()
@@ -464,10 +418,7 @@ class GeneticAlgorithm:
             total_volume = sum(self.packs[i][2] for i in solution.perm)
             total_distance = 0
             for i in range(1, len(solution.perm)):
-                total_distance += distance(
-                    self.packs[solution.perm[i - 1]][3],
-                    self.packs[solution.perm[i]][3],
-                )
+                total_distance += self.packs[solution.perm[i - 1]][3].distance_to(self.packs[solution.perm[i]][3]) 
             pack_count = len(solution.perm)
         return f"{total_weight=} {total_volume=} {total_distance=} {pack_count=}"
 
@@ -477,7 +428,7 @@ if __name__ == "__main__":
     max_weight = 120
     max_distance = 180
     min_chosen_packs = 8
-    start_address = (0, 0)
+    start_address = Point(0, 0)
 
     packs = [
         (0, 2, 1, (5, 25), 0),
@@ -511,7 +462,8 @@ if __name__ == "__main__":
         (28, 2, 5, (15, 17), 0),
         (29, 5, 1, (16, 9), 0),
     ]
-
+    packs = convert_to_package_list(packs)
+    
     ga = GeneticAlgorithm(
         max_volume,
         max_weight,

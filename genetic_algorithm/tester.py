@@ -58,6 +58,7 @@ if __name__ == "__main__":
 
         # Starting the simulation
         start_address, V, M, D, h, packs = input
+        print(packs[0])
         ga = GeneticAlgorithm(
             V, M, D, h,
             start_address,

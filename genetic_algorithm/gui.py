@@ -18,7 +18,7 @@ from mutation import (
     MUTATION_DICT,
 )
 from simulation import GeneticAlgorithm
-
+from data_classes import Package, Point
 
 class GUI:
     """GUI for selecting parameters and showing results."""
@@ -268,10 +268,11 @@ class GUI:
         )
         self.file_chosen = True
         with open(filename, "r", encoding="utf-8") as f:
-            x, y = map(int, f.readline().split())
+            x, y = map(float, f.readline().split())
             self.start_address_x_var.set(x)
             self.start_address_y_var.set(y)
-            volume, weight, distance, min_chosen_packs = map(int, f.readline().split())
+            volume, weight, distance, min_chosen_packs = f.readline().split()
+            volume, weight, distance, min_chosen_packs = float(volume), float(weight), float(distance), int(min_chosen_packs)
             self.max_volume_var.set(volume)
             self.max_weight_var.set(weight)
             self.max_distance_var.set(distance)
@@ -283,14 +284,16 @@ class GUI:
         if self.file_chosen:
             self.run_button.configure(state="disabled")
             for i in self.packs_text.get("1.0", "end-1c").split("\n"):
-                index, volume, weight, x, y, fragile = map(int, i.split())
-                self.packs.append((index, volume, weight, (x, y), fragile))
+                index, volume, weight, x, y, priority = i.split()
+                volume, weight, x, y = map(float, (volume, weight, x, y))
+                index, priority = map(int, (index, priority))
+                self.packs.append(Package(index, volume, weight, (x, y), priority))
             self.ga = GeneticAlgorithm(
                 max_volume=self.max_volume_var.get(),
                 max_weight=self.max_weight_var.get(),
                 max_distance=self.max_distance_var.get(),
                 min_chosen_packs=self.min_chosen_packs_var.get(),
-                start_address=(
+                start_address=Point(
                     self.start_address_x_var.get(),
                     self.start_address_y_var.get(),
                 ),

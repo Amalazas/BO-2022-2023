@@ -1,7 +1,7 @@
 import random
 
 from bitarray import bitarray
-from data_classes import PermSolution, MatSolution, Point, Package
+from data_classes import PermSolution, MatSolution, Point, Package, convert_to_package_list
 
 
 def generate_initial_solutions(V: float, M: float, D: float, h: int, start_address: Point, packs: list[Package], amount: int = 50,) -> list[PermSolution]:
@@ -49,8 +49,7 @@ def generate_initial_solutions(V: float, M: float, D: float, h: int, start_addre
             sol_generated_count += 1
 
         generation_attempts_count += 1
-
-    print("Done.")
+    print("\nDone.")
     return solutions
 
 
@@ -79,37 +78,38 @@ if __name__ == "__main__":
     h = 8  # Min Number Of Chosen Packs
 
     packs = [
-        Package(0, 2, 1, Point(5, 25), 0),
-        Package(1, 4, 8, Point(5, 1), 0),
-        Package(2, 2, 10, Point(9, 15), 0),
-        Package(3, 2, 7, Point(14, 13), 0),
-        Package(4, 2, 2, Point(23, 29), 0),
-        Package(5, 2, 8, Point(23, 14), 0),
-        Package(6, 8, 7, Point(21, 17), 1),
-        Package(7, 4, 5, Point(28, 27), 0),
-        Package(8, 1, 3, Point(2, 14), 0),
-        Package(9, 3, 7, Point(20, 5), 0),
-        Package(10, 4, 1, Point(7, 7), 0),
-        Package(11, 5, 1, Point(16, 26), 0),
-        Package(12, 8, 6, Point(17, 29), 0),
-        Package(13, 1, 1, Point(25, 21), 1),
-        Package(14, 5, 7, Point(29, 17), 0),
-        Package(15, 3, 1, Point(7, 9), 0),
-        Package(16, 5, 3, Point(23, 4), 0),
-        Package(17, 3, 8, Point(9, 23), 0),
-        Package(18, 8, 6, Point(28, 7), 0),
-        Package(19, 8, 9, Point(7, 29), 0),
-        Package(20, 8, 1, Point(9, 15), 0),
-        Package(21, 3, 1, Point(2, 24), 0),
-        Package(22, 7, 8, Point(27, 27), 0),
-        Package(23, 8, 1, Point(5, 12), 0),
-        Package(24, 1, 4, Point(13, 2), 0),
-        Package(25, 6, 4, Point(6, 15), 1),
-        Package(26, 4, 6, Point(16, 7), 0),
-        Package(27, 4, 2, Point(28, 18), 0),
-        Package(28, 2, 5, Point(15, 17), 0),
-        Package(29, 5, 1, Point(16, 9), 0),
+        (0, 2, 1, (5, 25), 0),
+        (1, 4, 8, (5, 1), 0),
+        (2, 2, 10, (9, 15), 0),
+        (3, 2, 7, (14, 13), 0),
+        (4, 2, 2, (23, 29), 0),
+        (5, 2, 8, (23, 14), 0),
+        (6, 8, 7, (21, 17), 1),
+        (7, 4, 5, (28, 27), 0),
+        (8, 1, 3, (2, 14), 0),
+        (9, 3, 7, (20, 5), 0),
+        (10, 4, 1, (7, 7), 0),
+        (11, 5, 1, (16, 26), 0),
+        (12, 8, 6, (17, 29), 0),
+        (13, 1, 1, (25, 21), 1),
+        (14, 5, 7, (29, 17), 0),
+        (15, 3, 1, (7, 9), 0),
+        (16, 5, 3, (23, 4), 0),
+        (17, 3, 8, (9, 23), 0),
+        (18, 8, 6, (28, 7), 0),
+        (19, 8, 9, (7, 29), 0),
+        (20, 8, 1, (9, 15), 0),
+        (21, 3, 1, (2, 24), 0),
+        (22, 7, 8, (27, 27), 0),
+        (23, 8, 1, (5, 12), 0),
+        (24, 1, 4, (13, 2), 0),
+        (25, 6, 4, (6, 15), 1),
+        (26, 4, 6, (16, 7), 0),
+        (27, 4, 2, (28, 18), 0),
+        (28, 2, 5, (15, 17), 0),
+        (29, 5, 1, (16, 9), 0),
     ]
+    packs = convert_to_package_list(packs)
 
     # Prints package addresses map
     map = [["-" for _ in range(max_y)] for _ in range(max_x)]
