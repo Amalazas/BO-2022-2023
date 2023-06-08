@@ -35,7 +35,7 @@ if __name__ == "__main__":
         print("Please, provide the input file's name with extention as an argument!")
         exit()
 
-    input = read_input_file("../input_files/" + sys.argv[1])
+    input = read_input_file("./input/" + sys.argv[1])
     
     if input is None:
         exit()
