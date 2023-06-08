@@ -139,9 +139,8 @@ class GeneticAlgorithm:
         self._initialize_population()
 
         if self.output_f is not None:
-            self.output_f.write(
-                f"generation, best_score, generation_best_score, avg_population_age, new_solutions_count\n"
-            )
+            self.output_f.write(f"generation,best_score,generation_best_score,avg_population_age,new_solutions_count\n")
+
 
         no_improvement_iter = 0
         for i in range(self.max_generations):

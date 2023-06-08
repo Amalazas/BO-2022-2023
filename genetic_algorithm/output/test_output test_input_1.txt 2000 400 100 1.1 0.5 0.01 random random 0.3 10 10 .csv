@@ -1,4 +1,4 @@
-generation, best_score, generation_best_score, avg_population_age, new_solutions_count
+generation,best_score,generation_best_score,avg_population_age,new_solutions_count
 0  ,  802.0423276    ,  802.0423276    ,  0.0            , 2001
 1  ,  785.8354584    ,  785.8354584    ,  0.7576211894   , 485
 2  ,  686.8719216    ,  686.8719216    ,  1.264867566    , 520
