@@ -8,6 +8,7 @@ matplotlib = "*"
 bitarray = "*"
 networkx = "*"
 customtkinter = "*"
+click = "*"
 
 [dev-packages]
 
