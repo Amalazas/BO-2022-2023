@@ -129,6 +129,14 @@ def choice_from_one_order_from_other(parent1: PermSolution, parent2: PermSolutio
     return PermSolution(new_choice, new_perm)
 
 
+CROSS_DICT = {
+    "choice_from_one_order_from_other": choice_from_one_order_from_other,
+    "extract_and_random_pick": extract_and_random_pick,
+    "halve_and_swap": halve_and_swap,
+    "random": None,
+}
+
+
 if __name__ == "__main__":
     # EXAMPLE OF PROBLEM DEFINITION
     start_address = Point(0, 0)  # Starting point for the Courier

@@ -5,6 +5,7 @@ from cross import (
     choice_from_one_order_from_other,
     extract_and_random_pick,
     halve_and_swap,
+    CROSS_DICT,
 )
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from mutation import (
@@ -14,24 +15,9 @@ from mutation import (
     inverse_permutation,
     shift_block,
     shuffle_block,
+    MUTATION_DICT,
 )
 from simulation import GeneticAlgorithm
-
-CROSS_DICT = {
-    "choice_from_one_order_from_other": choice_from_one_order_from_other,
-    "extract_and_random_pick": extract_and_random_pick,
-    "halve_and_swap": halve_and_swap,
-    "random": None,
-}
-MUTATION_DICT = {
-    "add_packs": add_packs,
-    "cut_out_packs": cut_out_packs,
-    "inverse_packages": inverse_packages,
-    "inverse_permutation": inverse_permutation,
-    "shift_block": shift_block,
-    "shuffle_block": shuffle_block,
-    "random": None,
-}
 
 
 class GUI:

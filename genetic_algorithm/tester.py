@@ -1,23 +1,9 @@
 from simulation import *
 from main import *
+from mutation import MUTATION_DICT
+from cross import CROSS_DICT
 import sys
 import os
-
-CROSS_DICT = {
-    "choice_from_one_order_from_other": choice_from_one_order_from_other,
-    "extract_and_random_pick": extract_and_random_pick,
-    "halve_and_swap": halve_and_swap,
-    "random": None,
-}
-MUTATION_DICT = {
-    "add_packs": add_packs,
-    "cut_out_packs": cut_out_packs,
-    "inverse_packages": inverse_packages,
-    "inverse_permutation": inverse_permutation,
-    "shift_block": shift_block,
-    "shuffle_block": shuffle_block,
-    "random": None,
-}
 
 
 if __name__ == "__main__":

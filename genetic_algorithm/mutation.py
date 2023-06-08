@@ -139,6 +139,17 @@ def add_packs(individual: PermSolution) -> None:
         )  # Adding the new package in the random place in the permutation
 
 
+MUTATION_DICT = {
+    "add_packs": add_packs,
+    "cut_out_packs": cut_out_packs,
+    "inverse_packages": inverse_packages,
+    "inverse_permutation": inverse_permutation,
+    "shift_block": shift_block,
+    "shuffle_block": shuffle_block,
+    "random": None,
+}
+
+
 if __name__ == "__main__":
     perm_sol = PermSolution(choice=bitarray("0011110101"), perm=[9, 2, 5, 3, 4, 7])
 
